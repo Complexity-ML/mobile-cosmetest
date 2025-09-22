@@ -1,0 +1,10 @@
+export { default as InfosPersonnellesSection } from './InfosPersonnellesSection';
+export { default as CaracteristiquesSection } from './CaracteristiquesSection';
+export { default as PeauSection } from './PeauSection';
+export { default as MarquesCutaneesSection } from './MarquesCutaneesSection';
+export { default as CheveuxSection } from './CheveuxSection';
+export { default as CilsSection } from './CilsSection';
+export { default as ProblemesSection } from './ProblemesSection';
+export { default as MedicalSection } from './MedicalSection';
+export { default as MesuresSection } from './MesuresSection';
+export { default as NotesSection } from './NotesSection';
