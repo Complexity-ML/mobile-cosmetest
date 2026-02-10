@@ -38,6 +38,10 @@ export default function HomeScreen() {
     router.push("/habitudes-cosmetiques");
   };
 
+  const goToPreInscription = () => {
+    router.push("/pre-inscription");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -77,6 +81,14 @@ export default function HomeScreen() {
             tintColor="#EDE9FE"
             iconColor="#7C3AED"
             onPress={goToHabitudesForm}
+          />
+          <HomeCard
+            title="Pré-inscrit"
+            description="Retrouvez votre fiche pré-remplie par le secrétariat"
+            icon="user-check"
+            tintColor="#FEF3C7"
+            iconColor="#D97706"
+            onPress={goToPreInscription}
           />
         </View>
       </View>

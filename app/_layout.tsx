@@ -69,6 +69,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ gestureEnabled: false }} />
         <Stack.Screen name="volontaire" />
         <Stack.Screen name="habitudes-cosmetiques" />
+        <Stack.Screen name="pre-inscription" />
         <Stack.Screen name="login" options={{ gestureEnabled: false }} />
       </Stack>
     </PaperProvider>

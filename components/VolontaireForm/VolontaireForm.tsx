@@ -83,10 +83,10 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     nomVol: d.nomVol ?? d.nom ?? d.lastName ?? '',
                     prenomVol: d.prenomVol ?? d.prenom ?? d.firstName ?? '',
                     email: d.email ?? d.emailVol ?? '',
-                    telephone: d.telephone ?? d.telPortableVol ?? '',
-                    telephoneDomicile: d.telephoneDomicile ?? d.telDomicileVol ?? '',
+                    telephone: d.telephone ?? d.telPortableVol ?? d.telPortable ?? '',
+                    telephoneDomicile: d.telephoneDomicile ?? d.telDomicileVol ?? d.telDomicile ?? '',
                     adresse: d.adresse ?? d.adresseVol ?? '',
-                    codePostal: d.codePostal ?? d.cpVol ?? '',
+                    codePostal: d.codePostal ?? d.cpVol ?? d.cp ?? '',
                     ville: d.ville ?? d.villeVol ?? '',
                     // keep pays if it existed previously
                     pays: d.pays ?? '',
@@ -387,17 +387,19 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
             const createdId: any = data?.id ?? data?.idVol ?? data?.idVOL ?? data?.volontaireId ?? data?.volunteerId ?? data?.data?.id;
 
             if (createdId !== undefined && createdId !== null) {
-                // Formulaire de création: créer les détails (POST) et non une mise à jour
-                if (!isEditMode) {
-                    try {
-                        const idStr = String(createdId);
-                        const detailsPayload = toVolontaireDetailDTO(formData, idStr);
-                        if (Object.keys(detailsPayload).length > 0) {
+                // Sauvegarder les détails (création ou mise à jour)
+                try {
+                    const idStr = String(createdId);
+                    const detailsPayload = toVolontaireDetailDTO(formData, idStr);
+                    if (Object.keys(detailsPayload).length > 0) {
+                        if (isEditMode) {
+                            await api.volontaires.updateDetails(idStr, detailsPayload);
+                        } else {
                             await api.volontaires.createDetails(detailsPayload);
                         }
-                    } catch (e) {
-                        console.warn('Création des détails du volontaire échouée:', e);
                     }
+                } catch (e) {
+                    console.warn('Sauvegarde des détails du volontaire échouée:', e);
                 }
                 setSuccessMessage(isEditMode ? 'Volontaire mis à jour avec succès!' : 'Volontaire créé avec succès!');
 

@@ -6,7 +6,7 @@ import logger from './logger';
 
 
 // Configuration de base d'axios
-const baseURL = (Constants?.expoConfig as any)?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:8888';
+const baseURL = (Constants?.expoConfig as any)?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL || 'http://192.168.127.36:8888';
 
 export const API: AxiosInstance = axios.create({
   baseURL,
@@ -133,6 +133,11 @@ const volontairesApi = {
   // Supprimer un volontaire
   delete: (id: string | number) => {
     return API.delete(`/api/volontaires/${id}`);
+  },
+
+  // Rechercher un volontaire par email (pré-inscription)
+  searchByEmail: (email: string) => {
+    return API.get('/api/volontaires/by-email', { params: { email } });
   }
 };
 

@@ -1,7 +1,84 @@
 import React from 'react';
-import { Text, Divider } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Text, Divider, Checkbox } from 'react-native-paper';
 import FormField from '../FormField';
 import { SectionProps } from '../types';
+
+const ETHNIES_PRINCIPALES = [
+    'Caucasienne',
+    'Africaine',
+    'Antillaise',
+    'Indienne',
+    'Asiatique',
+] as const;
+
+const SOUS_ETHNIES_PAR_ETHNIE: Record<string, string[]> = {
+    'Caucasienne': [
+        'EUROP_OUEST',
+        'EUROP_EST',
+        'MEDITERRANEEN',
+        'NORD_AMERICAIN_CAUCASIEN',
+        'SUD_AMERICAIN_CAUCASIEN',
+    ],
+    'Africaine': [
+        'AF_SUBSAHARIEN',
+        'AF_OUEST',
+        'AF_EST',
+        'AF_CENTRALE',
+        'AF_NORD',
+    ],
+    'Antillaise': [
+        'AFRO_CARABEEN',
+        'ANTILLAIS_METISSE',
+        'CARIBEENNE',
+        'AFRO_DESCENDANT_CARAIBES',
+    ],
+    'Indienne': [
+        'IND_NORD',
+        'IND_SUD',
+        'INDO_ARYENNE',
+        'DRAVIDIENNE',
+        'INDO_PAKISTANAISE',
+    ],
+    'Asiatique': [
+        'AS_EST',
+        'AS_SUD_EST',
+        'AS_SUD',
+        'AS_CENTRALE',
+    ],
+};
+
+const SOUS_ETHNIE_LABELS: Record<string, string> = {
+    'EUROP_OUEST': 'Europe de l\'Ouest',
+    'EUROP_EST': 'Europe de l\'Est',
+    'MEDITERRANEEN': 'Méditerranéen',
+    'NORD_AMERICAIN_CAUCASIEN': 'Nord-Américain Caucasien',
+    'SUD_AMERICAIN_CAUCASIEN': 'Sud-Américain Caucasien',
+    'AF_SUBSAHARIEN': 'Afrique Subsaharienne',
+    'AF_OUEST': 'Afrique de l\'Ouest',
+    'AF_EST': 'Afrique de l\'Est',
+    'AF_CENTRALE': 'Afrique Centrale',
+    'AF_NORD': 'Afrique du Nord',
+    'AFRO_CARABEEN': 'Afro-Caribéen',
+    'ANTILLAIS_METISSE': 'Antillais Métissé',
+    'CARIBEENNE': 'Caribéenne',
+    'AFRO_DESCENDANT_CARAIBES': 'Afro-Descendant Caraïbes',
+    'IND_NORD': 'Inde du Nord',
+    'IND_SUD': 'Inde du Sud',
+    'INDO_ARYENNE': 'Indo-Aryenne',
+    'DRAVIDIENNE': 'Dravidienne',
+    'INDO_PAKISTANAISE': 'Indo-Pakistanaise',
+    'AS_EST': 'Asie de l\'Est',
+    'AS_SUD_EST': 'Asie du Sud-Est',
+    'AS_SUD': 'Asie du Sud',
+    'AS_CENTRALE': 'Asie Centrale',
+};
+
+const parseCSV = (val: any): string[] => {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    return String(val).split(',').filter((e: string) => e.trim() !== '');
+};
 
 const CaracteristiquesSection: React.FC<SectionProps> = ({
     formData,
@@ -9,6 +86,46 @@ const CaracteristiquesSection: React.FC<SectionProps> = ({
     handleChange,
     handleBlur,
 }) => {
+    const ethniesSelectionnees = parseCSV(formData.ethnie);
+    const sousEthniesSelectionnees = parseCSV(formData.sousEthnie);
+
+    const handleEthnieToggle = (ethnie: string) => {
+        let newEthnies: string[];
+
+        if (ethniesSelectionnees.includes(ethnie)) {
+            newEthnies = ethniesSelectionnees.filter(e => e !== ethnie);
+            // Retirer les sous-ethnies liées
+            const sousEthniesDeEthnie = SOUS_ETHNIES_PAR_ETHNIE[ethnie] || [];
+            const newSousEthnies = sousEthniesSelectionnees.filter(
+                se => !sousEthniesDeEthnie.includes(se)
+            );
+            handleChange('sousEthnie', newSousEthnies.join(','));
+        } else {
+            if (ethniesSelectionnees.length >= 2) return;
+            newEthnies = [...ethniesSelectionnees, ethnie];
+        }
+
+        handleChange('ethnie', newEthnies.join(','));
+    };
+
+    const handleSousEthnieToggle = (sousEthnie: string) => {
+        let newSousEthnies: string[];
+
+        if (sousEthniesSelectionnees.includes(sousEthnie)) {
+            newSousEthnies = sousEthniesSelectionnees.filter(se => se !== sousEthnie);
+        } else {
+            newSousEthnies = [...sousEthniesSelectionnees, sousEthnie];
+        }
+
+        handleChange('sousEthnie', newSousEthnies.join(','));
+    };
+
+    const sousEthniesDisponibles: string[] = [];
+    ethniesSelectionnees.forEach(ethnie => {
+        const sousEthnies = SOUS_ETHNIES_PAR_ETHNIE[ethnie] || [];
+        sousEthniesDisponibles.push(...sousEthnies);
+    });
+
     return (
         <>
             <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Caractéristiques physiques</Text>
@@ -46,31 +163,50 @@ const CaracteristiquesSection: React.FC<SectionProps> = ({
                 ]}
             />
 
-            <FormField
-                label="Ethnie"
-                id="ethnie"
-                type="select"
-                value={formData.ethnie}
-                onChange={handleChange}
-                options={[
-                    'CAUCASIEN',
-                    'Caucasienne',
-                    'AFRICAIN',
-                    'Africaine',
-                    'ASIATIQUE',
-                    'HISPANIQUE',
-                    'MOYEN_ORIENT',
-                    'AUTRE',
-                ]}
-            />
+            {/* Ethnie principale - checkboxes (max 2) */}
+            <View style={styles.fieldContainer}>
+                <Text style={styles.fieldLabel}>Ethnie <Text style={styles.hint}>(max 2)</Text></Text>
+                <View style={styles.checkboxGroup}>
+                    {ETHNIES_PRINCIPALES.map((ethnie) => {
+                        const isSelected = ethniesSelectionnees.includes(ethnie);
+                        const isDisabled = !isSelected && ethniesSelectionnees.length >= 2;
+                        return (
+                            <Checkbox.Item
+                                key={ethnie}
+                                label={ethnie}
+                                status={isSelected ? 'checked' : 'unchecked'}
+                                onPress={() => !isDisabled && handleEthnieToggle(ethnie)}
+                                disabled={isDisabled}
+                                style={styles.checkboxItem}
+                                labelStyle={[styles.checkboxLabel, isDisabled && styles.checkboxLabelDisabled]}
+                                mode="android"
+                            />
+                        );
+                    })}
+                </View>
+            </View>
 
-            <FormField
-                label="Sous-ethnie"
-                id="sousEthnie"
-                type="text"
-                value={formData.sousEthnie}
-                onChange={handleChange}
-            />
+            {/* Sous-ethnies dynamiques */}
+            <View style={styles.fieldContainer}>
+                <Text style={styles.fieldLabel}>Sous-ethnie</Text>
+                {sousEthniesDisponibles.length > 0 ? (
+                    <View style={styles.checkboxGroup}>
+                        {sousEthniesDisponibles.map((sousEthnie) => (
+                            <Checkbox.Item
+                                key={sousEthnie}
+                                label={SOUS_ETHNIE_LABELS[sousEthnie] || sousEthnie}
+                                status={sousEthniesSelectionnees.includes(sousEthnie) ? 'checked' : 'unchecked'}
+                                onPress={() => handleSousEthnieToggle(sousEthnie)}
+                                style={styles.checkboxItem}
+                                labelStyle={styles.checkboxLabel}
+                                mode="android"
+                            />
+                        ))}
+                    </View>
+                ) : (
+                    <Text style={styles.hintText}>Sélectionnez d'abord une ethnie</Text>
+                )}
+            </View>
 
             <FormField
                 label="Couleur des yeux"
@@ -119,5 +255,44 @@ const CaracteristiquesSection: React.FC<SectionProps> = ({
         </>
     );
 };
+
+const styles = StyleSheet.create({
+    fieldContainer: {
+        marginBottom: 16,
+    },
+    fieldLabel: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#1F2937',
+        marginBottom: 4,
+    },
+    hint: {
+        fontSize: 12,
+        color: '#9CA3AF',
+        fontWeight: '400',
+    },
+    hintText: {
+        fontSize: 13,
+        color: '#9CA3AF',
+        fontStyle: 'italic',
+        paddingVertical: 8,
+    },
+    checkboxGroup: {
+        backgroundColor: '#F9FAFB',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        overflow: 'hidden',
+    },
+    checkboxItem: {
+        paddingVertical: 2,
+    },
+    checkboxLabel: {
+        fontSize: 14,
+    },
+    checkboxLabelDisabled: {
+        color: '#D1D5DB',
+    },
+});
 
 export default CaracteristiquesSection;

@@ -31,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -55,7 +55,7 @@
       "router": {
         "origin": false
       },
-      "apiUrl": "http://10.0.2.2:8888",
+      "apiUrl": "http://192.168.127.36:8888",
       "eas": {
         "projectId": "0be346aa-eee0-4bc1-89fd-7f9da656bfbc"
       }
