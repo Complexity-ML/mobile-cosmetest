@@ -30,16 +30,12 @@ export default function HomeScreen() {
     };
   }, []);
 
-  const goToVolontaireForm = () => {
-    router.push("/volontaire");
-  };
-
   const goToHabitudesForm = () => {
     router.push("/habitudes-cosmetiques");
   };
 
   const goToPreInscription = () => {
-    router.push("/pre-inscription");
+    router.push("/pre-inscription" as any);
   };
 
   return (
@@ -66,14 +62,6 @@ export default function HomeScreen() {
         
         {/* Cards */}
         <View style={styles.cardsRowContainer}>
-          <HomeCard
-            title="Infos volontaire"
-            description="Accédez au formulaire d'informations des volontaires"
-            icon="user"
-            tintColor="#E0F2FE"
-            iconColor="#0284C7"
-            onPress={goToVolontaireForm}
-          />
           <HomeCard
             title="Habitudes cosmétiques"
             description="Accédez au formulaire d'habitudes cosmétiques"

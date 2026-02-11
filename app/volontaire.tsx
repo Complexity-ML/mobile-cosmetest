@@ -12,6 +12,13 @@ export default function VolontairePage() {
   const params = useLocalSearchParams();
   const id = params.id as string | undefined;
 
+  // Pas d'id = pas de volontaire pré-inscrit → rediriger
+  React.useEffect(() => {
+    if (!id) {
+      router.replace("/pre-inscription" as any);
+    }
+  }, [id]);
+
   const handleClose = () => {
     router.back();
   };

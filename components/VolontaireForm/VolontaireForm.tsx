@@ -248,6 +248,11 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     out.idVol = typeof volontaireId === 'string' ? parseInt(volontaireId, 10) : volontaireId;
                 }
 
+                // Champs obligatoires pour la validation backend
+                put('nomVol', data.nomVol);
+                put('prenomVol', data.prenomVol);
+                put('emailVol', data.email);
+
                 // Peau & exposition
                 put('carnation', data.carnation);
                 put('bronzage', data.bronzage);
@@ -384,7 +389,9 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
             }
 
             const data = response?.data as any;
-            const createdId: any = data?.id ?? data?.idVol ?? data?.idVOL ?? data?.volontaireId ?? data?.volunteerId ?? data?.data?.id;
+            const createdId: any = isEditMode
+                ? id
+                : (data?.id ?? data?.idVol ?? data?.idVOL ?? data?.volontaireId ?? data?.volunteerId ?? data?.data?.id);
 
             if (createdId !== undefined && createdId !== null) {
                 // Sauvegarder les détails (création ou mise à jour)

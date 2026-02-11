@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, ScrollView, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { Text, Snackbar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
@@ -29,14 +29,47 @@ const VolontaireHcForm: React.FC = () => {
 
   const [formData, setFormData] = useState<FormData>({ idVol: undefined });
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [existingData, setExistingData] = useState(false);
 
-  // Chargement initial des données
+  // Chargement initial des données existantes
   useEffect(() => {
     if (idVol) {
-      // Initialiser tous les champs avec false par défaut
-      const initialFormData = initializeAllFieldsBoolean(idVol);
-      setFormData(initialFormData);
+      const loadExistingData = async () => {
+        const initialFormData = initializeAllFieldsBoolean(idVol);
+        setLoadingData(true);
+        try {
+          const response = await api.habituesCosmetiques.getByVolontaireId(idVol);
+          if (response.data) {
+            const d = response.data as any;
+            // Merger les données existantes sur les valeurs par défaut
+            const merged: FormData = { ...initialFormData };
+            for (const key of Object.keys(initialFormData)) {
+              if (key === 'idVol') continue;
+              const val = d[key];
+              if (val === true || val === 'oui' || val === 'Oui') {
+                merged[key] = true;
+              } else {
+                merged[key] = false;
+              }
+            }
+            setFormData(merged);
+            setExistingData(true);
+          } else {
+            setFormData(initialFormData);
+          }
+        } catch (error: any) {
+          // 404 = pas encore de données, on garde les valeurs par défaut
+          if (error?.response?.status !== 404) {
+            console.warn('Erreur chargement habitudes cosmétiques:', error);
+          }
+          setFormData(initialFormData);
+        } finally {
+          setLoadingData(false);
+        }
+      };
+      loadExistingData();
     }
   }, [idVol]);
 
@@ -55,9 +88,16 @@ const VolontaireHcForm: React.FC = () => {
 
     setLoading(true);
     try {
-      // Envoyer les données du formulaire au serveur
+      if (existingData) {
+        // Supprimer l'ancien enregistrement puis recréer
+        try {
+          await api.habituesCosmetiques.delete(formData.idVol);
+        } catch (e) {
+          // Ignorer si la suppression échoue (peut-être déjà supprimé)
+        }
+      }
       await api.habituesCosmetiques.create(formData);
-      
+
       Alert.alert('Succès', 'Données enregistrées !', [
         { text: 'OK', onPress: () => navigation.navigate('index') }
       ]);
@@ -68,6 +108,15 @@ const VolontaireHcForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (loadingData) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
+        <ActivityIndicator size="large" color="#7C3AED" />
+        <Text style={{ marginTop: 16, color: '#6B7280' }}>Chargement des habitudes cosmétiques...</Text>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView

@@ -83,6 +83,7 @@ const PeauSection: React.FC<SectionProps> = ({
                     'NORMALE',
                     'SECHE',
                     'GRASSE',
+                    'MIXTE',
                     'MIXTE TENDANCE GRASSE',
                     'MIXTE TENDANCE SECHE',
                 ]}
