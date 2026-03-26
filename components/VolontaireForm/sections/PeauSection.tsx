@@ -80,12 +80,12 @@ const PeauSection: React.FC<SectionProps> = ({
                 autoFocus={focusFieldId === 'typePeau'}
                 focusRequestId={focusRequestId}
                 options={[
-                    'NORMALE',
-                    'SECHE',
-                    'GRASSE',
-                    'MIXTE',
-                    'MIXTE TENDANCE GRASSE',
-                    'MIXTE TENDANCE SECHE',
+                    'Normale',
+                    'Sèche',
+                    'Grasse',
+                    'Mixte',
+                    'Mixte à tendance grasse',
+                    'Mixte à tendance sèche',
                 ]}
             />
 

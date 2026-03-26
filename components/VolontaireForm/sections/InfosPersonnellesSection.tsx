@@ -118,8 +118,8 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 focusRequestId={focusRequestId}
                 options={[
                     'Masculin',
-                    'Feminin',
-                    'Autre',
+                    'Féminin',
+                    'O',
                 ]}
             />
 

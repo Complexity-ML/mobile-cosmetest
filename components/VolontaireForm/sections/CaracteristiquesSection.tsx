@@ -154,12 +154,12 @@ const CaracteristiquesSection: React.FC<SectionProps> = ({
                 value={formData.phototype}
                 onChange={handleChange}
                 options={[
-                    'I - Peau très claire',
-                    'II - Peau claire',
-                    'III - Peau claire à mate',
-                    'IV - Peau mate',
-                    'V - Peau foncée',
-                    'VI - Peau noire',
+                    { label: 'Phototype 1 - Peau très claire', value: 'Phototype 1' },
+                    { label: 'Phototype 2 - Peau claire', value: 'Phototype 2' },
+                    { label: 'Phototype 3 - Peau claire à mate', value: 'Phototype 3' },
+                    { label: 'Phototype 4 - Peau mate', value: 'Phototype 4' },
+                    { label: 'Phototype 5 - Peau foncée', value: 'Phototype 5' },
+                    { label: 'Phototype 6 - Peau noire', value: 'Phototype 6' },
                 ]}
             />
 
