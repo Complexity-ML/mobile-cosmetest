@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, Divider } from 'react-native-paper';
 import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
+import MultiSelectButtons from '../MultiSelectButtons';
 import { SectionProps } from '../types';
 
 const useNoneLogic = (
@@ -42,10 +43,7 @@ const CheveuxSection: React.FC<SectionProps> = ({
     handleChange,
     handleBlur,
 }) => {
-    const cheveuxIds = ['cuirCheveluSensible', 'chuteDeCheveux', 'cheveuxCassants', 'cheveuxProblemeAucun'];
     const onglesIds = ['onglesCassants', 'onglesDedoubles', 'onglesProblemeAucun'];
-
-    const toggleCheveux = useNoneLogic(cheveuxIds, 'cheveuxProblemeAucun', formData, handleChange);
     const toggleOngles = useNoneLogic(onglesIds, 'onglesProblemeAucun', formData, handleChange);
 
     return (
@@ -60,30 +58,7 @@ const CheveuxSection: React.FC<SectionProps> = ({
                 type="select"
                 value={formData.couleurCheveux}
                 onChange={handleChange}
-                options={[
-                    'Blonds',
-                    'Bruns',
-                    'Chatains',
-                    'Noirs',
-                    'Roux',
-                    'Gris',
-                    'Blancs',
-                    'Colorés',
-                ]}
-            />
-
-            <FormField
-                label="Longueur des cheveux"
-                id="longueurCheveux"
-                type="select"
-                value={formData.longueurCheveux}
-                onChange={handleChange}
-                options={[
-                    'Courts',
-                    'Mi-longs',
-                    'Longs',
-                    'Très longs',
-                ]}
+                options={['Blonds', 'Bruns', 'Chatains', 'Noirs', 'Roux', 'Gris', 'Blancs', 'Colorés']}
             />
 
             <FormField
@@ -92,13 +67,7 @@ const CheveuxSection: React.FC<SectionProps> = ({
                 type="select"
                 value={formData.natureCheveux}
                 onChange={handleChange}
-                options={[
-                    'Lisses',
-                    'Ondulés',
-                    'Bouclés',
-                    'Crépus',
-                    'Frisés',
-                ]}
+                options={['Lisses', 'Ondulés', 'Bouclés', 'Crépus', 'Frisés']}
             />
 
             <FormField
@@ -107,11 +76,7 @@ const CheveuxSection: React.FC<SectionProps> = ({
                 type="select"
                 value={formData.epaisseurCheveux}
                 onChange={handleChange}
-                options={[
-                    'Fins',
-                    'Moyens',
-                    'Épais',
-                ]}
+                options={['Fins', 'Moyens', 'Épais']}
             />
 
             <FormField
@@ -120,62 +85,42 @@ const CheveuxSection: React.FC<SectionProps> = ({
                 type="select"
                 value={formData.natureCuirChevelu}
                 onChange={handleChange}
-                options={[
-                    'Normal',
-                    'Sec',
-                    'Gras',
-                    'Mixte',
-                ]}
+                options={['Normal', 'Sec', 'Gras', 'Mixte']}
             />
 
-            <Text variant="titleMedium" style={{ marginBottom: 8, marginTop: 12 }}>Problèmes capillaires</Text>
+            <MultiSelectButtons
+                label="Problèmes capillaires"
+                id="problemesCapillaires"
+                options={['Aucun', 'Cuir chevelu sensible', 'Chute de cheveux', 'Cheveux cassants']}
+                value={formData.problemesCapillaires || ''}
+                onChange={handleChange}
+            />
 
             <CheckboxField
-                label="Aucun"
-                id="cheveuxProblemeAucun"
-                checked={formData.cheveuxProblemeAucun === 'Oui'}
-                onChange={(id) => toggleCheveux(id)}
+                label="Calvitie"
+                id="calvitie"
+                checked={formData.calvitie === 'Oui'}
+                onChange={handleChange}
             />
             <CheckboxField
-                label="Cuir chevelu sensible"
-                id="cuirCheveluSensible"
-                checked={formData.cuirCheveluSensible === 'Oui'}
-                onChange={(id) => toggleCheveux(id)}
+                label="Pellicules"
+                id="pellicules"
+                checked={formData.pellicules === 'Oui'}
+                onChange={handleChange}
             />
             <CheckboxField
-                label="Chute de cheveux"
-                id="chuteDeCheveux"
-                checked={formData.chuteDeCheveux === 'Oui'}
-                onChange={(id) => toggleCheveux(id)}
-            />
-            <CheckboxField
-                label="Cheveux cassants"
-                id="cheveuxCassants"
-                checked={formData.cheveuxCassants === 'Oui'}
-                onChange={(id) => toggleCheveux(id)}
+                label="Démangeaisons du cuir chevelu"
+                id="demangeaisonsCuirChevelu"
+                checked={formData.demangeaisonsCuirChevelu === 'Oui'}
+                onChange={handleChange}
             />
 
             <Divider style={{ marginVertical: 12 }} />
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Ongles</Text>
 
-            <CheckboxField
-                label="Aucun"
-                id="onglesProblemeAucun"
-                checked={formData.onglesProblemeAucun === 'Oui'}
-                onChange={(id) => toggleOngles(id)}
-            />
-            <CheckboxField
-                label="Ongles cassants"
-                id="onglesCassants"
-                checked={formData.onglesCassants === 'Oui'}
-                onChange={(id) => toggleOngles(id)}
-            />
-            <CheckboxField
-                label="Ongles dédoublés"
-                id="onglesDedoubles"
-                checked={formData.onglesDedoubles === 'Oui'}
-                onChange={(id) => toggleOngles(id)}
-            />
+            <CheckboxField label="Aucun" id="onglesProblemeAucun" checked={formData.onglesProblemeAucun === 'Oui'} onChange={(id) => toggleOngles(id)} />
+            <CheckboxField label="Ongles cassants" id="onglesCassants" checked={formData.onglesCassants === 'Oui'} onChange={(id) => toggleOngles(id)} />
+            <CheckboxField label="Ongles dédoublés" id="onglesDedoubles" checked={formData.onglesDedoubles === 'Oui'} onChange={(id) => toggleOngles(id)} />
         </>
     );
 };

@@ -6,5 +6,3 @@ export { default as CheveuxSection } from './CheveuxSection';
 export { default as CilsSection } from './CilsSection';
 export { default as ProblemesSection } from './ProblemesSection';
 export { default as MedicalSection } from './MedicalSection';
-export { default as MesuresSection } from './MesuresSection';
-export { default as NotesSection } from './NotesSection';

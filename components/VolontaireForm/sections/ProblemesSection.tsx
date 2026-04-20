@@ -43,8 +43,7 @@ const ProblemesSection: React.FC<SectionProps> = ({
 }) => {
     const problemesIds = [
         'acne', 'couperoseRosacee', 'dermiteSeborrheique', 'eczema',
-        'psoriasis', 'angiome', 'pityriasis', 'vitiligo',
-        'melanome', 'zona', 'herpes', 'pelade', 'problemesAucun',
+        'psoriasis', 'problemesAucun',
     ];
 
     const toggleProblemes = useNoneLogic(problemesIds, 'problemesAucun', formData, handleChange);
@@ -54,84 +53,12 @@ const ProblemesSection: React.FC<SectionProps> = ({
             <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Problèmes spécifiques</Text>
             <Divider style={{ marginBottom: 12 }} />
 
-            <CheckboxField
-                label="Aucun"
-                id="problemesAucun"
-                checked={formData.problemesAucun === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Acné"
-                id="acne"
-                checked={formData.acne === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Couperose / Rosacée"
-                id="couperoseRosacee"
-                checked={formData.couperoseRosacee === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Dermite séborrhéique"
-                id="dermiteSeborrheique"
-                checked={formData.dermiteSeborrheique === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Eczéma"
-                id="eczema"
-                checked={formData.eczema === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Psoriasis"
-                id="psoriasis"
-                checked={formData.psoriasis === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Angiome"
-                id="angiome"
-                checked={formData.angiome === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Pityriasis"
-                id="pityriasis"
-                checked={formData.pityriasis === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Vitiligo"
-                id="vitiligo"
-                checked={formData.vitiligo === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Mélanome"
-                id="melanome"
-                checked={formData.melanome === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Zona"
-                id="zona"
-                checked={formData.zona === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Herpès"
-                id="herpes"
-                checked={formData.herpes === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
-            <CheckboxField
-                label="Pelade"
-                id="pelade"
-                checked={formData.pelade === 'Oui'}
-                onChange={(id) => toggleProblemes(id)}
-            />
+            <CheckboxField label="Aucun" id="problemesAucun" checked={formData.problemesAucun === 'Oui'} onChange={(id) => toggleProblemes(id)} />
+            <CheckboxField label="Acné" id="acne" checked={formData.acne === 'Oui'} onChange={(id) => toggleProblemes(id)} />
+            <CheckboxField label="Couperose / Rosacée" id="couperoseRosacee" checked={formData.couperoseRosacee === 'Oui'} onChange={(id) => toggleProblemes(id)} />
+            <CheckboxField label="Dermite séborrhéique" id="dermiteSeborrheique" checked={formData.dermiteSeborrheique === 'Oui'} onChange={(id) => toggleProblemes(id)} />
+            <CheckboxField label="Eczéma" id="eczema" checked={formData.eczema === 'Oui'} onChange={(id) => toggleProblemes(id)} />
+            <CheckboxField label="Psoriasis" id="psoriasis" checked={formData.psoriasis === 'Oui'} onChange={(id) => toggleProblemes(id)} />
         </>
     );
 };

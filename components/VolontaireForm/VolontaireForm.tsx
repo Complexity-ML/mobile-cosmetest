@@ -16,8 +16,6 @@ import {
     CilsSection,
     ProblemesSection,
     MedicalSection,
-    MesuresSection,
-    NotesSection,
 } from './sections';
 
 type NavProps = {
@@ -478,10 +476,6 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 return <ProblemesSection {...sectionProps} />;
             case 'medical':
                 return <MedicalSection {...sectionProps} />;
-            case 'mesures':
-                return <MesuresSection {...sectionProps} />;
-            case 'notes':
-                return <NotesSection {...sectionProps} />;
             default:
                 return <InfosPersonnellesSection {...sectionProps} />;
         }

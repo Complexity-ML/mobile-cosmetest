@@ -13,8 +13,6 @@ export const useFormTabs = (initialTab: TabId = 'infos-personnelles') => {
         { id: 'cils', label: 'Cils', icon: 'eye' },
         { id: 'problemes', label: 'Problèmes', icon: 'alert-triangle' },
         { id: 'medical', label: 'Médical', icon: 'heart' },
-        { id: 'mesures', label: 'Mesures', icon: 'bar-chart-2' },
-        { id: 'notes', label: 'Notes', icon: 'file-text' },
     ];
 
     return {
