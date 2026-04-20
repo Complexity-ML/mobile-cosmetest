@@ -203,8 +203,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
             // Map frontend form -> backend VolontaireDTO
             const mapSexe = (s?: string) => {
                 const v = (s || '').toLowerCase();
-                if (v.startsWith('f')) return 'F'; // Féminin/F -> F
-                if (v.startsWith('m')) return 'M'; // Masculin/M -> M
+                if (v.startsWith('f')) return 'Féminin';
+                if (v.startsWith('m')) return 'Masculin';
                 if (v.includes('autre') || v === 'o') return 'Autre';
                 return s || undefined;
             };
@@ -542,7 +542,7 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
             case 'habitudes-cosmetiques':
                 return <HabitudesCosmetiquesSection {...sectionProps} />;
             case 'terminer':
-                return <TerminerSection {...sectionProps} onSubmit={handleSubmit} isSaving={isSaving} />;
+                return <TerminerSection {...sectionProps} onSubmit={handleSubmit} onCancel={() => navigation.goBack()} isSaving={isSaving} />;
             default:
                 return <InfosPersonnellesSection {...sectionProps} />;
         }
@@ -612,25 +612,6 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     </>
                 )}
 
-                <View style={{ padding: 16, backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#e0e0e0' }}>
-                    <Button
-                        mode="outlined"
-                        onPress={() => navigation.goBack()}
-                        style={{ marginBottom: 8 }}
-                    >
-                        Annuler
-                    </Button>
-
-                    <Button
-                        mode="contained"
-                        onPress={handleSubmit}
-                        disabled={isSaving}
-                        loading={isSaving}
-                        icon={isSaving ? undefined : "content-save"}
-                    >
-                        {isSaving ? 'Enregistrement...' : (isEditMode ? 'Mettre à jour' : 'Enregistrer')}
-                    </Button>
-                </View>
 
                 <Snackbar
                     visible={!!errorMessage}

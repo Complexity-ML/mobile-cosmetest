@@ -5,6 +5,7 @@ import { SectionProps } from '../types';
 
 interface TerminerSectionProps extends SectionProps {
   onSubmit?: () => void;
+  onCancel?: () => void;
   isSaving?: boolean;
 }
 
@@ -18,6 +19,7 @@ const Line = ({ label, value }: { label: string; value: any }) => (
 const TerminerSection: React.FC<TerminerSectionProps> = ({
   formData,
   onSubmit,
+  onCancel,
   isSaving,
 }) => {
   const name = `${formData.prenomVol || ''} ${formData.nomVol || ''}`.trim() || '—';
@@ -82,6 +84,17 @@ const TerminerSection: React.FC<TerminerSectionProps> = ({
       >
         {isSaving ? 'Enregistrement...' : 'Enregistrer le questionnaire'}
       </Button>
+
+      {onCancel && (
+        <Button
+          mode="outlined"
+          onPress={onCancel}
+          disabled={isSaving}
+          style={styles.cancelButton}
+        >
+          Annuler
+        </Button>
+      )}
     </View>
   );
 };
@@ -120,6 +133,9 @@ const styles = StyleSheet.create({
   submitButton: {
     paddingVertical: 8,
     backgroundColor: '#7C3AED',
+  },
+  cancelButton: {
+    marginTop: 12,
   },
 });
 
