@@ -8,3 +8,4 @@ export { default as ProblemesSection } from './ProblemesSection';
 export { default as MedicalSection } from './MedicalSection';
 export { default as MedecineEsthetiqueSection } from './MedecineEsthetiqueSection';
 export { default as HabitudesCosmetiquesSection } from './HabitudesCosmetiquesSection';
+export { default as TerminerSection } from './TerminerSection';

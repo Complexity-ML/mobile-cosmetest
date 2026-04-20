@@ -18,6 +18,7 @@ import {
     MedicalSection,
     MedecineEsthetiqueSection,
     HabitudesCosmetiquesSection,
+    TerminerSection,
 } from './sections';
 
 type NavProps = {
@@ -478,15 +479,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 const idStr = String(createdId);
                 if (onSubmitSuccess) {
                     onSubmitSuccess(idStr);
-                } else if (!isEmbedded) {
-                    // Par défaut, aller sur le formulaire Habitudes Cosmétiques
-                    // en passant l'id du volontaire nouvellement créé
-                    setTimeout(() => {
-                        // Using expo-router pattern via query string
-                        // @ts-ignore - navigation may not understand path; fallback to router if injected later
-                        navigation.navigate('/habitudes-cosmetiques', { idVol: idStr });
-                    }, 500);
                 }
+                // Ne plus rediriger vers habitudes-cosmetiques : tout est maintenant dans le même formulaire
             } else {
                 // Si l'ID n'est pas clairement renvoyé, rester visuel mais informer
                 setSuccessMessage('Volontaire créé. ID non détecté.');
@@ -547,6 +541,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 return <MedecineEsthetiqueSection {...sectionProps} />;
             case 'habitudes-cosmetiques':
                 return <HabitudesCosmetiquesSection {...sectionProps} />;
+            case 'terminer':
+                return <TerminerSection {...sectionProps} onSubmit={handleSubmit} isSaving={isSaving} />;
             default:
                 return <InfosPersonnellesSection {...sectionProps} />;
         }

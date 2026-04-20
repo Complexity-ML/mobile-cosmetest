@@ -15,6 +15,7 @@ export const useFormTabs = (initialTab: TabId = 'infos-personnelles') => {
         { id: 'medical', label: 'Médical', icon: 'heart' },
         { id: 'medecine-esthetique', label: 'Médecine esthétique', icon: 'zap' },
         { id: 'habitudes-cosmetiques', label: 'Habitudes cosmétiques', icon: 'shopping-bag' },
+        { id: 'terminer', label: 'Terminer', icon: 'check-circle' },
     ];
 
     return {

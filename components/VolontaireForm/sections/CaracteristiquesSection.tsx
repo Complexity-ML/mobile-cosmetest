@@ -252,6 +252,45 @@ const CaracteristiquesSection: React.FC<SectionProps> = ({
                 value={formData.origineMere}
                 onChange={handleChange}
             />
+
+            <Divider style={{ marginVertical: 16 }} />
+            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Marques corporelles</Text>
+
+            <FormField
+                label="Cicatrices (localisation)"
+                id="cicatrices"
+                type="text"
+                value={formData.cicatrices}
+                onChange={handleChange}
+                placeholder="Laissez vide si aucune"
+            />
+
+            <FormField
+                label="Tatouages (localisation)"
+                id="tatouages"
+                type="text"
+                value={formData.tatouages}
+                onChange={handleChange}
+                placeholder="Laissez vide si aucun"
+            />
+
+            <FormField
+                label="Piercings (localisation)"
+                id="piercings"
+                type="text"
+                value={formData.piercings}
+                onChange={handleChange}
+                placeholder="Laissez vide si aucun"
+            />
+
+            <FormField
+                label="Maquillage permanent (localisation)"
+                id="maquillagePermanent"
+                type="text"
+                value={formData.maquillagePermanent}
+                onChange={handleChange}
+                placeholder="Laissez vide si aucun"
+            />
         </>
     );
 };

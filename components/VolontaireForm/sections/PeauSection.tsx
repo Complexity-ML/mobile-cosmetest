@@ -5,38 +5,6 @@ import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
-const useNoneLogic = (
-    ids: string[],
-    noneId: string,
-    formData: any,
-    handleChange: (id: string, value: string) => void
-) => {
-    const handleToggleWithNone = (id: string) => {
-        const currentVal = formData[id];
-        const isCurrentlyChecked = currentVal === 'Oui';
-
-        if (id === noneId) {
-            if (!isCurrentlyChecked) {
-                ids.forEach(fieldId => {
-                    if (fieldId !== noneId && formData[fieldId] === 'Oui') {
-                        handleChange(fieldId, 'Non');
-                    }
-                });
-                handleChange(noneId, 'Oui');
-            } else {
-                handleChange(noneId, 'Non');
-            }
-        } else {
-            if (!isCurrentlyChecked && formData[noneId] === 'Oui') {
-                handleChange(noneId, 'Non');
-            }
-            handleChange(id, isCurrentlyChecked ? 'Non' : 'Oui');
-        }
-    };
-
-    return handleToggleWithNone;
-};
-
 const PeauSection: React.FC<SectionProps> = ({
     formData,
     errors,
@@ -45,8 +13,6 @@ const PeauSection: React.FC<SectionProps> = ({
     focusFieldId,
     focusRequestId,
 }) => {
-    const celluliteIds = ['celluliteBras', 'celluliteFessesHanches', 'celluliteJambes', 'celluliteVentreTaille', 'celluliteAucun'];
-    const toggleCellulite = useNoneLogic(celluliteIds, 'celluliteAucun', formData, handleChange);
 
     return (
         <>
@@ -164,11 +130,23 @@ const PeauSection: React.FC<SectionProps> = ({
             <Divider style={{ marginVertical: 12 }} />
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Cellulite</Text>
 
-            <CheckboxField label="Aucun" id="celluliteAucun" checked={formData.celluliteAucun === 'Oui'} onChange={(id) => toggleCellulite(id)} />
-            <CheckboxField label="Bras" id="celluliteBras" checked={formData.celluliteBras === 'Oui'} onChange={(id) => toggleCellulite(id)} />
-            <CheckboxField label="Fesses/Hanches" id="celluliteFessesHanches" checked={formData.celluliteFessesHanches === 'Oui'} onChange={(id) => toggleCellulite(id)} />
-            <CheckboxField label="Jambes" id="celluliteJambes" checked={formData.celluliteJambes === 'Oui'} onChange={(id) => toggleCellulite(id)} />
-            <CheckboxField label="Ventre/Taille" id="celluliteVentreTaille" checked={formData.celluliteVentreTaille === 'Oui'} onChange={(id) => toggleCellulite(id)} />
+            <CheckboxField label="Bras" id="celluliteBras" checked={formData.celluliteBras === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Fesses / Hanches" id="celluliteFessesHanches" checked={formData.celluliteFessesHanches === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Jambes" id="celluliteJambes" checked={formData.celluliteJambes === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Ventre / Taille" id="celluliteVentreTaille" checked={formData.celluliteVentreTaille === 'Oui'} onChange={handleChange} />
+
+            <Divider style={{ marginVertical: 12 }} />
+            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Sécheresse de la peau</Text>
+
+            <CheckboxField label="Lèvres" id="secheresseLevres" checked={formData.secheresseLevres === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Cou" id="secheresseCou" checked={formData.secheresseCou === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Poitrine / Décolleté" id="secheressePoitrineDecollete" checked={formData.secheressePoitrineDecollete === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Ventre / Taille" id="secheresseVentreTaille" checked={formData.secheresseVentreTaille === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Fesses / Hanches" id="secheresseFessesHanches" checked={formData.secheresseFessesHanches === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Bras" id="secheresseBras" checked={formData.secheresseBras === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Mains" id="secheresseMains" checked={formData.secheresseMains === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Jambes" id="secheresseJambes" checked={formData.secheresseJambes === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Pieds" id="secheressePieds" checked={formData.secheressePieds === 'Oui'} onChange={handleChange} />
 
             <Divider style={{ marginVertical: 12 }} />
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Problèmes autour des yeux</Text>
@@ -184,19 +162,6 @@ const PeauSection: React.FC<SectionProps> = ({
             <CheckboxField label="Cou" id="perteDeFermeteCou" checked={formData.perteDeFermeteCou === 'Oui'} onChange={handleChange} />
             <CheckboxField label="Décolleté / Poitrine" id="perteDeFermeteDecollete" checked={formData.perteDeFermeteDecollete === 'Oui'} onChange={handleChange} />
             <CheckboxField label="Avant-bras" id="perteDeFermeteAvantBras" checked={formData.perteDeFermeteAvantBras === 'Oui'} onChange={handleChange} />
-
-            <Divider style={{ marginVertical: 12 }} />
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Sécheresse de la peau</Text>
-
-            <CheckboxField label="Lèvres" id="secheresseLevres" checked={formData.secheresseLevres === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Cou" id="secheresseCou" checked={formData.secheresseCou === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Poitrine / Décolleté" id="secheressePoitrineDecollete" checked={formData.secheressePoitrineDecollete === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Ventre / Taille" id="secheresseVentreTaille" checked={formData.secheresseVentreTaille === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Fesses / Hanches" id="secheresseFessesHanches" checked={formData.secheresseFessesHanches === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Bras" id="secheresseBras" checked={formData.secheresseBras === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Mains" id="secheresseMains" checked={formData.secheresseMains === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Jambes" id="secheresseJambes" checked={formData.secheresseJambes === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Pieds" id="secheressePieds" checked={formData.secheressePieds === 'Oui'} onChange={handleChange} />
         </>
     );
 };
