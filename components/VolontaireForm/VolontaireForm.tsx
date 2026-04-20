@@ -16,6 +16,7 @@ import {
     CilsSection,
     ProblemesSection,
     MedicalSection,
+    MedecineEsthetiqueSection,
     HabitudesCosmetiquesSection,
 } from './sections';
 
@@ -310,6 +311,14 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 put('tatouages', data.tatouages);
                 put('piercings', data.piercings);
 
+                // Médecine esthétique
+                put('injectionsVisage', data.injectionsVisage);
+                put('injectionsVisageZone', data.injectionsVisageZone);
+                put('injectionsVisageDate', data.injectionsVisageDate);
+                put('maquillagePermanentVisage', data.maquillagePermanentVisage);
+                put('maquillagePermanentVisageZone', data.maquillagePermanentVisageZone);
+                put('maquillagePermanentVisageDate', data.maquillagePermanentVisageDate);
+
                 // Vergetures
                 put('vergeturesJambes', data.vergeturesJambes);
                 put('vergeturesFessesHanches', data.vergeturesFessesHanches);
@@ -534,6 +543,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 return <ProblemesSection {...sectionProps} />;
             case 'medical':
                 return <MedicalSection {...sectionProps} />;
+            case 'medecine-esthetique':
+                return <MedecineEsthetiqueSection {...sectionProps} />;
             case 'habitudes-cosmetiques':
                 return <HabitudesCosmetiquesSection {...sectionProps} />;
             default:

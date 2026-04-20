@@ -25,6 +25,7 @@ export type TabId =
     | 'cils'
     | 'problemes'
     | 'medical'
+    | 'medecine-esthetique'
     | 'habitudes-cosmetiques';
 
 export interface FormTab {
