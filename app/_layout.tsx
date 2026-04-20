@@ -68,7 +68,6 @@ export default function RootLayout() {
         {/* Définir toutes les routes ici, qu'elles soient accessibles ou non */}
         <Stack.Screen name="index" options={{ gestureEnabled: false }} />
         <Stack.Screen name="volontaire" />
-        <Stack.Screen name="habitudes-cosmetiques" />
         <Stack.Screen name="pre-inscription" />
         <Stack.Screen name="login" options={{ gestureEnabled: false }} />
       </Stack>

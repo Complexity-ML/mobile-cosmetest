@@ -23,9 +23,9 @@ export default function VolontairePage() {
     router.back();
   };
 
-  const handleSuccess = (volontaireId: string) => {
-    // Naviguer vers les habitudes cosmétiques après création
-    router.push(`/habitudes-cosmetiques?idVol=${volontaireId}`);
+  const handleSuccess = (_volontaireId: string) => {
+    // Questionnaire terminé : retour à l'accueil
+    router.replace("/");
   };
 
   return (

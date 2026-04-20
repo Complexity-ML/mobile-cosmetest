@@ -30,10 +30,6 @@ export default function HomeScreen() {
     };
   }, []);
 
-  const goToHabitudesForm = () => {
-    router.push("/habitudes-cosmetiques");
-  };
-
   const goToPreInscription = () => {
     router.push("/pre-inscription" as any);
   };
@@ -62,14 +58,6 @@ export default function HomeScreen() {
         
         {/* Cards */}
         <View style={styles.cardsRowContainer}>
-          <HomeCard
-            title="Habitudes cosmétiques"
-            description="Accédez au formulaire d'habitudes cosmétiques"
-            icon="list"
-            tintColor="#EDE9FE"
-            iconColor="#7C3AED"
-            onPress={goToHabitudesForm}
-          />
           <HomeCard
             title="Pré-inscrit"
             description="Retrouvez votre fiche pré-remplie par le secrétariat"

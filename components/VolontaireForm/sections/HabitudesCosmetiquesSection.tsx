@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text, Divider } from 'react-native-paper';
 import { SectionProps } from '../types';
-import { FORM_SECTIONS } from '../../VolontaireHc/formConfig';
+import { FORM_SECTIONS } from '../habitudesCosmetiquesConfig';
 
 // Bouton Oui/Non style vert/rouge
 const BooleanField = ({ label, id, value, onChange }: {

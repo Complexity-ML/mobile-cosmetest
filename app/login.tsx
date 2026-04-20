@@ -163,6 +163,8 @@ export default function LoginScreen() {
                 ref={passwordRef}
                 accessibilityLabel="Mot de passe"
                 testID="login-password"
+                autoCapitalize="none"
+                autoCorrect={false}
                 error={!!error && !password.trim()}
               />
               {!!error && !password.trim() && (
