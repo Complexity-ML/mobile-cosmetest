@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Divider } from 'react-native-paper';
 import FormField from '../FormField';
-import MultiSelectButtons from '../MultiSelectButtons';
+import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
 const CilsSection: React.FC<SectionProps> = ({
@@ -44,13 +44,11 @@ const CilsSection: React.FC<SectionProps> = ({
                 options={['Droits', 'Courbés']}
             />
 
-            <MultiSelectButtons
-                label="Problèmes des cils"
-                id="problemesCils"
-                options={['Cils abîmés', 'Cils broussailleux', 'Chute de cils']}
-                value={formData.problemesCils || ''}
-                onChange={handleChange}
-            />
+            <Text variant="titleMedium" style={{ marginBottom: 8, marginTop: 12 }}>Problèmes des cils</Text>
+
+            <CheckboxField label="Cils abîmés" id="cilsAbimes" checked={formData.cilsAbimes === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Cils broussailleux" id="cilsBroussailleux" checked={formData.cilsBroussailleux === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Chute de cils" id="chuteDeCils" checked={formData.chuteDeCils === 'Oui'} onChange={handleChange} />
 
             <Divider style={{ marginVertical: 12 }} />
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Sourcils</Text>

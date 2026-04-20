@@ -2,7 +2,6 @@ import React from 'react';
 import { Text, Divider } from 'react-native-paper';
 import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
-import MultiSelectButtons from '../MultiSelectButtons';
 import { SectionProps } from '../types';
 
 const useNoneLogic = (
@@ -88,13 +87,11 @@ const CheveuxSection: React.FC<SectionProps> = ({
                 options={['Normal', 'Sec', 'Gras', 'Mixte']}
             />
 
-            <MultiSelectButtons
-                label="Problèmes capillaires"
-                id="problemesCapillaires"
-                options={['Aucun', 'Cuir chevelu sensible', 'Chute de cheveux', 'Cheveux cassants']}
-                value={formData.problemesCapillaires || ''}
-                onChange={handleChange}
-            />
+            <Text variant="titleMedium" style={{ marginBottom: 8, marginTop: 12 }}>Problèmes capillaires</Text>
+
+            <CheckboxField label="Cuir chevelu sensible" id="cuirCheveluSensible" checked={formData.cuirCheveluSensible === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Chute de cheveux" id="chuteDeCheveux" checked={formData.chuteDeCheveux === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Cheveux cassants" id="cheveuxCassants" checked={formData.cheveuxCassants === 'Oui'} onChange={handleChange} />
 
             <CheckboxField
                 label="Calvitie"

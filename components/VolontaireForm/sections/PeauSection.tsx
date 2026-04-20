@@ -3,7 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Divider } from 'react-native-paper';
 import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
-import MultiSelectButtons from '../MultiSelectButtons';
 import { SectionProps } from '../types';
 
 const useNoneLogic = (
@@ -172,29 +171,32 @@ const PeauSection: React.FC<SectionProps> = ({
             <CheckboxField label="Ventre/Taille" id="celluliteVentreTaille" checked={formData.celluliteVentreTaille === 'Oui'} onChange={(id) => toggleCellulite(id)} />
 
             <Divider style={{ marginVertical: 12 }} />
-            <MultiSelectButtons
-                label="Problèmes autour des yeux"
-                id="problemesYeux"
-                options={['Aucun', 'Cernes pigmentaires', 'Cernes vasculaires', 'Poches']}
-                value={formData.problemesYeux || ''}
-                onChange={handleChange}
-            />
+            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Problèmes autour des yeux</Text>
 
-            <MultiSelectButtons
-                label="Perte de fermeté"
-                id="perteDeFermete"
-                options={['Aucune', 'Visage', 'Cou', 'Décolleté / Poitrine', 'Avant-bras']}
-                value={formData.perteDeFermete || ''}
-                onChange={handleChange}
-            />
+            <CheckboxField label="Cernes vasculaires" id="cernesVasculaires" checked={formData.cernesVasculaires === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Cernes pigmentaires" id="cernesPigmentaires" checked={formData.cernesPigmentaires === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Poches" id="poches" checked={formData.poches === 'Oui'} onChange={handleChange} />
 
-            <MultiSelectButtons
-                label="Sécheresse de la peau"
-                id="secheressePeau"
-                options={['Aucune', 'Lèvres', 'Cou', 'Poitrine / Décolleté', 'Ventre / Taille', 'Fesses / Hanches', 'Bras', 'Mains', 'Avant-bras']}
-                value={formData.secheressePeau || ''}
-                onChange={handleChange}
-            />
+            <Divider style={{ marginVertical: 12 }} />
+            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Perte de fermeté</Text>
+
+            <CheckboxField label="Visage" id="perteDeFermeteVisage" checked={formData.perteDeFermeteVisage === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Cou" id="perteDeFermeteCou" checked={formData.perteDeFermeteCou === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Décolleté / Poitrine" id="perteDeFermeteDecollete" checked={formData.perteDeFermeteDecollete === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Avant-bras" id="perteDeFermeteAvantBras" checked={formData.perteDeFermeteAvantBras === 'Oui'} onChange={handleChange} />
+
+            <Divider style={{ marginVertical: 12 }} />
+            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Sécheresse de la peau</Text>
+
+            <CheckboxField label="Lèvres" id="secheresseLevres" checked={formData.secheresseLevres === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Cou" id="secheresseCou" checked={formData.secheresseCou === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Poitrine / Décolleté" id="secheressePoitrineDecollete" checked={formData.secheressePoitrineDecollete === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Ventre / Taille" id="secheresseVentreTaille" checked={formData.secheresseVentreTaille === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Fesses / Hanches" id="secheresseFessesHanches" checked={formData.secheresseFessesHanches === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Bras" id="secheresseBras" checked={formData.secheresseBras === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Mains" id="secheresseMains" checked={formData.secheresseMains === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Jambes" id="secheresseJambes" checked={formData.secheresseJambes === 'Oui'} onChange={handleChange} />
+            <CheckboxField label="Pieds" id="secheressePieds" checked={formData.secheressePieds === 'Oui'} onChange={handleChange} />
         </>
     );
 };

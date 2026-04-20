@@ -16,6 +16,7 @@ import {
     CilsSection,
     ProblemesSection,
     MedicalSection,
+    HabitudesCosmetiquesSection,
 } from './sections';
 
 type NavProps = {
@@ -92,6 +93,27 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     sexe: d.sexe ?? '',
                     typePeau: d.typePeau ?? d.typePeauVisage ?? '',
                 };
+                // Charger aussi les habitudes cosmétiques
+                try {
+                    const hcResponse = await api.habituesCosmetiques.getByVolontaireId(volontaireId);
+                    if (hcResponse.data) {
+                        const hc = hcResponse.data as any;
+                        for (const key of Object.keys(hc)) {
+                            if (key === 'idVol') continue;
+                            const val = hc[key];
+                            if (val === true || val === 'oui' || val === 'Oui') {
+                                mapped[key] = 'oui';
+                            } else if (val === false || val === 'non' || val === 'Non') {
+                                mapped[key] = 'non';
+                            }
+                        }
+                    }
+                } catch (hcError: any) {
+                    if (hcError?.response?.status !== 404) {
+                        console.warn('Erreur chargement habitudes cosmétiques:', hcError);
+                    }
+                }
+
                 setFormData(mapped);
             }
         } catch (error) {
@@ -406,6 +428,42 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 } catch (e) {
                     console.warn('Sauvegarde des détails du volontaire échouée:', e);
                 }
+                // Sauvegarder les habitudes cosmétiques
+                try {
+                    const idStr = String(createdId);
+                    const hcFields = Object.keys(formData).filter(k =>
+                        k.startsWith('achat') || k.startsWith('produits') || k.startsWith('soin') ||
+                        k.startsWith('rasoir') || k.startsWith('epilat') || k.startsWith('cire') ||
+                        k.startsWith('creme') || k.startsWith('gel') || k.startsWith('lait') ||
+                        k.startsWith('savon') || k.startsWith('deodorant') || k.startsWith('anti') ||
+                        k.startsWith('shampoing') || k.startsWith('apres') || k.startsWith('masque') ||
+                        k.startsWith('fond') || k.startsWith('poudre') || k.startsWith('blush') ||
+                        k.startsWith('correcteur') || k.startsWith('anticerne') || k.startsWith('base') ||
+                        k.startsWith('mascara') || k.startsWith('crayon') || k.startsWith('eyeliner') ||
+                        k.startsWith('fard') || k.startsWith('maquillage') || k.startsWith('faux') ||
+                        k.startsWith('rouge') || k.startsWith('gloss') || k.startsWith('vernis') ||
+                        k.startsWith('dissolvant') || k.startsWith('manucure') || k.startsWith('protecteur') ||
+                        k.startsWith('autobronzant') || k.startsWith('parfum') || k.startsWith('eau') ||
+                        k.startsWith('mousse') || k.startsWith('tondeuse') || k.startsWith('ombre') ||
+                        k.startsWith('institut') || k.startsWith('nettoyant') || k.startsWith('lotion') ||
+                        k.startsWith('tonique') || k.startsWith('colorat') || k.startsWith('permanent') ||
+                        k.startsWith('lissage') || k.startsWith('extension') || k.startsWith('produitCoif') ||
+                        k.startsWith('produitsBain') || k.startsWith('demaquillant')
+                    );
+                    if (hcFields.some(k => formData[k] && formData[k] !== '')) {
+                        const hcData: any = { idVol: parseInt(idStr, 10) };
+                        for (const k of hcFields) {
+                            const v = formData[k];
+                            if (v === 'oui' || v === 'Oui') hcData[k] = 'oui';
+                            else hcData[k] = 'non';
+                        }
+                        try { await api.habituesCosmetiques.delete(parseInt(idStr, 10)); } catch (_) {}
+                        await api.habituesCosmetiques.create(hcData);
+                    }
+                } catch (e) {
+                    console.warn('Sauvegarde des habitudes cosmétiques échouée:', e);
+                }
+
                 setSuccessMessage(isEditMode ? 'Volontaire mis à jour avec succès!' : 'Volontaire créé avec succès!');
 
                 const idStr = String(createdId);
@@ -476,6 +534,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 return <ProblemesSection {...sectionProps} />;
             case 'medical':
                 return <MedicalSection {...sectionProps} />;
+            case 'habitudes-cosmetiques':
+                return <HabitudesCosmetiquesSection {...sectionProps} />;
             default:
                 return <InfosPersonnellesSection {...sectionProps} />;
         }
