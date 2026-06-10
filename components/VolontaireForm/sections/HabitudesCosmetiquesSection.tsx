@@ -4,15 +4,17 @@ import { Text, Divider } from 'react-native-paper';
 import { SectionProps } from '../types';
 import { FORM_SECTIONS } from '../habitudesCosmetiquesConfig';
 
-// Bouton Oui/Non style vert/rouge
+const isOuiValue = (value: unknown) => value === true || String(value).toLowerCase() === 'oui' || String(value).toLowerCase() === 'true';
+const isNonValue = (value: unknown) => value === false || String(value).toLowerCase() === 'non' || String(value).toLowerCase() === 'false';
+
 const BooleanField = ({ label, id, value, onChange }: {
   label: string;
   id: string;
   value: string;
   onChange: (name: string, value: string) => void;
 }) => {
-  const isOui = value === 'Oui' || value === 'oui' || value === 'true' || value === true as any;
-  const isNon = value === 'Non' || value === 'non' || value === 'false' || value === false as any;
+  const isOui = isOuiValue(value);
+  const isNon = isNonValue(value);
 
   return (
     <View style={styles.row}>

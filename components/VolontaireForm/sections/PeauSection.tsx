@@ -5,6 +5,92 @@ import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
+const SELECT_FIELDS = [
+    {
+        label: 'Sensibilité cutanée',
+        id: 'sensibiliteCutanee',
+        options: ['Peau sensible', 'Peau peu sensible', 'Peau non sensible'],
+    },
+    {
+        label: 'Carnation',
+        id: 'carnation',
+        options: ['Très claire', 'Claire', 'Moyenne', 'Mate', 'Foncée', 'Très foncée'],
+    },
+] as const;
+
+const TYPE_PEAU_OPTIONS = [
+    'Normale',
+    'Sèche',
+    'Grasse',
+    'Mixte',
+    'Mixte à tendance grasse',
+    'Mixte à tendance sèche',
+    'Sensible',
+] as const;
+
+const SOLAR_FIELDS = [
+    {
+        label: 'Exposition solaire',
+        id: 'expositionSolaire',
+        options: ['Faiblement', 'Moyennement', 'Fortement'],
+    },
+    {
+        label: 'Bronzage',
+        id: 'bronzage',
+        options: ['Progressif', 'Rapide', 'Difficile', 'Inexistant'],
+    },
+    {
+        label: 'Coups de soleil',
+        id: 'coupsDeSoleil',
+        options: ['Jamais', 'Rarement', 'Parfois', 'Souvent', 'Toujours'],
+    },
+] as const;
+
+const CHECKBOX_GROUPS = [
+    {
+        title: 'Cellulite',
+        fields: [
+            { label: 'Bras', id: 'celluliteBras' },
+            { label: 'Fesses / Hanches', id: 'celluliteFessesHanches' },
+            { label: 'Jambes', id: 'celluliteJambes' },
+            { label: 'Ventre / Taille', id: 'celluliteVentreTaille' },
+        ],
+    },
+    {
+        title: 'Sécheresse de la peau',
+        fields: [
+            { label: 'Lèvres', id: 'secheresseLevres' },
+            { label: 'Cou', id: 'secheresseCou' },
+            { label: 'Poitrine / Décolleté', id: 'secheressePoitrineDecollete' },
+            { label: 'Ventre / Taille', id: 'secheresseVentreTaille' },
+            { label: 'Fesses / Hanches', id: 'secheresseFessesHanches' },
+            { label: 'Bras', id: 'secheresseBras' },
+            { label: 'Mains', id: 'secheresseMains' },
+            { label: 'Jambes', id: 'secheresseJambes' },
+            { label: 'Pieds', id: 'secheressePieds' },
+        ],
+    },
+    {
+        title: 'Problèmes autour des yeux',
+        fields: [
+            { label: 'Cernes vasculaires', id: 'cernesVasculaires' },
+            { label: 'Cernes pigmentaires', id: 'cernesPigmentaires' },
+            { label: 'Poches', id: 'poches' },
+        ],
+    },
+    {
+        title: 'Perte de fermeté',
+        fields: [
+            { label: 'Visage', id: 'perteDeFermeteVisage' },
+            { label: 'Cou', id: 'perteDeFermeteCou' },
+            { label: 'Décolleté / Poitrine', id: 'perteDeFermeteDecollete' },
+            { label: 'Avant-bras', id: 'perteDeFermeteAvantBras' },
+        ],
+    },
+] as const;
+
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const PeauSection: React.FC<SectionProps> = ({
     formData,
     errors,
@@ -13,40 +99,22 @@ const PeauSection: React.FC<SectionProps> = ({
     focusFieldId,
     focusRequestId,
 }) => {
-
     return (
         <>
             <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Caractéristiques de la peau</Text>
             <Divider style={{ marginBottom: 12 }} />
 
-            <FormField
-                label="Sensibilité cutanée"
-                id="sensibiliteCutanee"
-                type="select"
-                value={formData.sensibiliteCutanee}
-                onChange={handleChange}
-                options={[
-                    'Peau sensible',
-                    'Peau peu sensible',
-                    'Peau non sensible',
-                ]}
-            />
-
-            <FormField
-                label="Carnation"
-                id="carnation"
-                type="select"
-                value={formData.carnation}
-                onChange={handleChange}
-                options={[
-                    'Très claire',
-                    'Claire',
-                    'Moyenne',
-                    'Mate',
-                    'Foncée',
-                    'Très foncée',
-                ]}
-            />
+            {SELECT_FIELDS.map((field) => (
+                <FormField
+                    key={field.id}
+                    label={field.label}
+                    id={field.id}
+                    type="select"
+                    value={formData[field.id]}
+                    onChange={handleChange}
+                    options={[...field.options]}
+                />
+            ))}
 
             <FormField
                 label="Type de peau (visage)"
@@ -59,22 +127,14 @@ const PeauSection: React.FC<SectionProps> = ({
                 error={errors.typePeau}
                 autoFocus={focusFieldId === 'typePeau'}
                 focusRequestId={focusRequestId}
-                options={[
-                    'Normale',
-                    'Sèche',
-                    'Grasse',
-                    'Mixte',
-                    'Mixte à tendance grasse',
-                    'Mixte à tendance sèche',
-                    'Sensible',
-                ]}
+                options={[...TYPE_PEAU_OPTIONS]}
             />
 
             <View style={styles.checkboxWithHint}>
                 <CheckboxField
                     label="Teint inhomogène"
                     id="teintInhomogene"
-                    checked={formData.teintInhomogene === 'Oui'}
+                    checked={isYes(formData.teintInhomogene)}
                     onChange={handleChange}
                 />
                 <Text style={styles.definition}>Couleur / reliefs (grain de beauté, taches, cicatrices...)</Text>
@@ -84,7 +144,7 @@ const PeauSection: React.FC<SectionProps> = ({
                 <CheckboxField
                     label="Teint terne"
                     id="teintTerne"
-                    checked={formData.teintTerne === 'Oui'}
+                    checked={isYes(formData.teintTerne)}
                     onChange={handleChange}
                 />
                 <Text style={styles.definition}>Manque d'éclat</Text>
@@ -93,75 +153,41 @@ const PeauSection: React.FC<SectionProps> = ({
             <CheckboxField
                 label="Pores visibles"
                 id="poresVisibles"
-                checked={formData.poresVisibles === 'Oui'}
+                checked={isYes(formData.poresVisibles)}
                 onChange={handleChange}
             />
 
             <Divider style={{ marginVertical: 12 }} />
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Exposition au soleil</Text>
 
-            <FormField
-                label="Exposition solaire"
-                id="expositionSolaire"
-                type="select"
-                value={formData.expositionSolaire}
-                onChange={handleChange}
-                options={['Faiblement', 'Moyennement', 'Fortement']}
-            />
+            {SOLAR_FIELDS.map((field) => (
+                <FormField
+                    key={field.id}
+                    label={field.label}
+                    id={field.id}
+                    type="select"
+                    value={formData[field.id]}
+                    onChange={handleChange}
+                    options={[...field.options]}
+                />
+            ))}
 
-            <FormField
-                label="Bronzage"
-                id="bronzage"
-                type="select"
-                value={formData.bronzage}
-                onChange={handleChange}
-                options={['Progressif', 'Rapide', 'Difficile', 'Inexistant']}
-            />
+            {CHECKBOX_GROUPS.map((group) => (
+                <React.Fragment key={group.title}>
+                    <Divider style={{ marginVertical: 12 }} />
+                    <Text variant="titleMedium" style={{ marginBottom: 8 }}>{group.title}</Text>
 
-            <FormField
-                label="Coups de soleil"
-                id="coupsDeSoleil"
-                type="select"
-                value={formData.coupsDeSoleil}
-                onChange={handleChange}
-                options={['Jamais', 'Rarement', 'Parfois', 'Souvent', 'Toujours']}
-            />
-
-            <Divider style={{ marginVertical: 12 }} />
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Cellulite</Text>
-
-            <CheckboxField label="Bras" id="celluliteBras" checked={formData.celluliteBras === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Fesses / Hanches" id="celluliteFessesHanches" checked={formData.celluliteFessesHanches === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Jambes" id="celluliteJambes" checked={formData.celluliteJambes === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Ventre / Taille" id="celluliteVentreTaille" checked={formData.celluliteVentreTaille === 'Oui'} onChange={handleChange} />
-
-            <Divider style={{ marginVertical: 12 }} />
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Sécheresse de la peau</Text>
-
-            <CheckboxField label="Lèvres" id="secheresseLevres" checked={formData.secheresseLevres === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Cou" id="secheresseCou" checked={formData.secheresseCou === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Poitrine / Décolleté" id="secheressePoitrineDecollete" checked={formData.secheressePoitrineDecollete === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Ventre / Taille" id="secheresseVentreTaille" checked={formData.secheresseVentreTaille === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Fesses / Hanches" id="secheresseFessesHanches" checked={formData.secheresseFessesHanches === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Bras" id="secheresseBras" checked={formData.secheresseBras === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Mains" id="secheresseMains" checked={formData.secheresseMains === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Jambes" id="secheresseJambes" checked={formData.secheresseJambes === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Pieds" id="secheressePieds" checked={formData.secheressePieds === 'Oui'} onChange={handleChange} />
-
-            <Divider style={{ marginVertical: 12 }} />
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Problèmes autour des yeux</Text>
-
-            <CheckboxField label="Cernes vasculaires" id="cernesVasculaires" checked={formData.cernesVasculaires === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Cernes pigmentaires" id="cernesPigmentaires" checked={formData.cernesPigmentaires === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Poches" id="poches" checked={formData.poches === 'Oui'} onChange={handleChange} />
-
-            <Divider style={{ marginVertical: 12 }} />
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Perte de fermeté</Text>
-
-            <CheckboxField label="Visage" id="perteDeFermeteVisage" checked={formData.perteDeFermeteVisage === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Cou" id="perteDeFermeteCou" checked={formData.perteDeFermeteCou === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Décolleté / Poitrine" id="perteDeFermeteDecollete" checked={formData.perteDeFermeteDecollete === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Avant-bras" id="perteDeFermeteAvantBras" checked={formData.perteDeFermeteAvantBras === 'Oui'} onChange={handleChange} />
+                    {group.fields.map((field) => (
+                        <CheckboxField
+                            key={field.id}
+                            label={field.label}
+                            id={field.id}
+                            checked={isYes(formData[field.id])}
+                            onChange={handleChange}
+                        />
+                    ))}
+                </React.Fragment>
+            ))}
         </>
     );
 };

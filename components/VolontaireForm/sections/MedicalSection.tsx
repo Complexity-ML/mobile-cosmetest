@@ -1,15 +1,15 @@
 import React from 'react';
-import { View } from 'react-native';
 import { Text, Divider } from 'react-native-paper';
 import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
+const CONTRACEPTION_OPTIONS = ['Pilule', 'Stérilet', 'Implant', 'Patch', 'Autre', 'Abstinence'];
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const MedicalSection: React.FC<SectionProps> = ({
     formData,
-    errors,
     handleChange,
-    handleBlur,
 }) => {
     return (
         <>
@@ -40,33 +40,31 @@ const MedicalSection: React.FC<SectionProps> = ({
                 type="select"
                 value={formData.contraception}
                 onChange={handleChange}
-                options={['Pilule', 'Stérilet', 'Implant', 'Patch', 'Autre', 'Abstinence']}
+                options={CONTRACEPTION_OPTIONS}
             />
 
             <CheckboxField
                 label="Ménopause"
                 id="menopause"
-                checked={formData.menopause === 'Oui'}
+                checked={isYes(formData.menopause)}
                 onChange={handleChange}
             />
 
             <CheckboxField
                 label="Bouffées de chaleur (ménopause)"
                 id="bouffeeChaleurMenaupose"
-                checked={formData.bouffeeChaleurMenaupose === 'Oui'}
+                checked={isYes(formData.bouffeeChaleurMenaupose)}
                 onChange={handleChange}
             />
 
-            <View>
-                <FormField
-                    label="Allergies connues"
-                    id="allergiesCommentaires"
-                    type="textarea"
-                    value={formData.allergiesCommentaires}
-                    onChange={handleChange}
-                    placeholder="Allergies connues (médicaments, aliments, autres substances)"
-                />
-            </View>
+            <FormField
+                label="Allergies connues"
+                id="allergiesCommentaires"
+                type="textarea"
+                value={formData.allergiesCommentaires}
+                onChange={handleChange}
+                placeholder="Allergies connues (médicaments, aliments, autres substances)"
+            />
 
             <FormField
                 label="Santé compatible"

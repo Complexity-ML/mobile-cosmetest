@@ -3,20 +3,30 @@ import { Text, Divider } from 'react-native-paper';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
+const PROBLEMES_FIELDS = [
+    { label: 'Aucun', id: 'problemesAucun' },
+    { label: 'Acné', id: 'acne' },
+    { label: 'Couperose / Rosacée', id: 'couperoseRosacee' },
+    { label: 'Dermite séborrhéique', id: 'dermiteSeborrheique' },
+    { label: 'Eczéma', id: 'eczema' },
+    { label: 'Psoriasis', id: 'psoriasis' },
+] as const;
+
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const useNoneLogic = (
-    ids: string[],
+    ids: readonly string[],
     noneId: string,
-    formData: any,
+    formData: Record<string, string>,
     handleChange: (id: string, value: string) => void
 ) => {
     const handleToggleWithNone = (id: string) => {
-        const currentVal = formData[id];
-        const isCurrentlyChecked = currentVal === 'Oui';
+        const isCurrentlyChecked = isYes(formData[id]);
 
         if (id === noneId) {
             if (!isCurrentlyChecked) {
                 ids.forEach(fieldId => {
-                    if (fieldId !== noneId && formData[fieldId] === 'Oui') {
+                    if (fieldId !== noneId && isYes(formData[fieldId])) {
                         handleChange(fieldId, 'Non');
                     }
                 });
@@ -24,12 +34,13 @@ const useNoneLogic = (
             } else {
                 handleChange(noneId, 'Non');
             }
-        } else {
-            if (!isCurrentlyChecked && formData[noneId] === 'Oui') {
-                handleChange(noneId, 'Non');
-            }
-            handleChange(id, isCurrentlyChecked ? 'Non' : 'Oui');
+            return;
         }
+
+        if (!isCurrentlyChecked && isYes(formData[noneId])) {
+            handleChange(noneId, 'Non');
+        }
+        handleChange(id, isCurrentlyChecked ? 'Non' : 'Oui');
     };
 
     return handleToggleWithNone;
@@ -37,15 +48,9 @@ const useNoneLogic = (
 
 const ProblemesSection: React.FC<SectionProps> = ({
     formData,
-    errors,
     handleChange,
-    handleBlur,
 }) => {
-    const problemesIds = [
-        'acne', 'couperoseRosacee', 'dermiteSeborrheique', 'eczema',
-        'psoriasis', 'problemesAucun',
-    ];
-
+    const problemesIds = PROBLEMES_FIELDS.map(field => field.id);
     const toggleProblemes = useNoneLogic(problemesIds, 'problemesAucun', formData, handleChange);
 
     return (
@@ -53,12 +58,15 @@ const ProblemesSection: React.FC<SectionProps> = ({
             <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Problèmes spécifiques</Text>
             <Divider style={{ marginBottom: 12 }} />
 
-            <CheckboxField label="Aucun" id="problemesAucun" checked={formData.problemesAucun === 'Oui'} onChange={(id) => toggleProblemes(id)} />
-            <CheckboxField label="Acné" id="acne" checked={formData.acne === 'Oui'} onChange={(id) => toggleProblemes(id)} />
-            <CheckboxField label="Couperose / Rosacée" id="couperoseRosacee" checked={formData.couperoseRosacee === 'Oui'} onChange={(id) => toggleProblemes(id)} />
-            <CheckboxField label="Dermite séborrhéique" id="dermiteSeborrheique" checked={formData.dermiteSeborrheique === 'Oui'} onChange={(id) => toggleProblemes(id)} />
-            <CheckboxField label="Eczéma" id="eczema" checked={formData.eczema === 'Oui'} onChange={(id) => toggleProblemes(id)} />
-            <CheckboxField label="Psoriasis" id="psoriasis" checked={formData.psoriasis === 'Oui'} onChange={(id) => toggleProblemes(id)} />
+            {PROBLEMES_FIELDS.map((field) => (
+                <CheckboxField
+                    key={field.id}
+                    label={field.label}
+                    id={field.id}
+                    checked={isYes(formData[field.id])}
+                    onChange={(id) => toggleProblemes(id)}
+                />
+            ))}
         </>
     );
 };

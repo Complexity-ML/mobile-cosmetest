@@ -4,11 +4,23 @@ import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
+const CILS_FIELDS = [
+    { label: 'Épaisseur des cils', id: 'epaisseurCils', options: ['Fins', 'Moyens', 'Épais'] },
+    { label: 'Longueur des cils', id: 'longueurCils', options: ['Courts', 'Moyens', 'Longs'] },
+    { label: 'Courbure des cils', id: 'courbureCils', options: ['Droits', 'Courbés'] },
+] as const;
+
+const CILS_PROBLEMES = [
+    { label: 'Cils abîmés', id: 'cilsAbimes' },
+    { label: 'Cils broussailleux', id: 'cilsBroussailleux' },
+    { label: 'Chute de cils', id: 'chuteDeCils' },
+] as const;
+
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const CilsSection: React.FC<SectionProps> = ({
     formData,
-    errors,
     handleChange,
-    handleBlur,
 }) => {
     return (
         <>
@@ -17,38 +29,29 @@ const CilsSection: React.FC<SectionProps> = ({
 
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Caractéristiques des cils</Text>
 
-            <FormField
-                label="Épaisseur des cils"
-                id="epaisseurCils"
-                type="select"
-                value={formData.epaisseurCils}
-                onChange={handleChange}
-                options={['Fins', 'Moyens', 'Épais']}
-            />
-
-            <FormField
-                label="Longueur des cils"
-                id="longueurCils"
-                type="select"
-                value={formData.longueurCils}
-                onChange={handleChange}
-                options={['Courts', 'Moyens', 'Longs']}
-            />
-
-            <FormField
-                label="Courbure des cils"
-                id="courbureCils"
-                type="select"
-                value={formData.courbureCils}
-                onChange={handleChange}
-                options={['Droits', 'Courbés']}
-            />
+            {CILS_FIELDS.map((field) => (
+                <FormField
+                    key={field.id}
+                    label={field.label}
+                    id={field.id}
+                    type="select"
+                    value={formData[field.id]}
+                    onChange={handleChange}
+                    options={[...field.options]}
+                />
+            ))}
 
             <Text variant="titleMedium" style={{ marginBottom: 8, marginTop: 12 }}>Problèmes des cils</Text>
 
-            <CheckboxField label="Cils abîmés" id="cilsAbimes" checked={formData.cilsAbimes === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Cils broussailleux" id="cilsBroussailleux" checked={formData.cilsBroussailleux === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Chute de cils" id="chuteDeCils" checked={formData.chuteDeCils === 'Oui'} onChange={handleChange} />
+            {CILS_PROBLEMES.map((field) => (
+                <CheckboxField
+                    key={field.id}
+                    label={field.label}
+                    id={field.id}
+                    checked={isYes(formData[field.id])}
+                    onChange={handleChange}
+                />
+            ))}
 
             <Divider style={{ marginVertical: 12 }} />
             <Text variant="titleMedium" style={{ marginBottom: 8 }}>Sourcils</Text>

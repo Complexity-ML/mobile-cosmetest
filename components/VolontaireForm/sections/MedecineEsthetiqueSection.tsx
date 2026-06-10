@@ -5,13 +5,14 @@ import FormField from '../FormField';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const MedecineEsthetiqueSection: React.FC<SectionProps> = ({
     formData,
     handleChange,
-    handleBlur,
 }) => {
-    const injectionsActive = formData.injectionsVisage === 'Oui';
-    const maquillageActive = formData.maquillagePermanentVisage === 'Oui';
+    const injectionsActive = isYes(formData.injectionsVisage);
+    const maquillageActive = isYes(formData.maquillagePermanentVisage);
 
     return (
         <>

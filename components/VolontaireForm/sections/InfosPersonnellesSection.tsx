@@ -3,6 +3,9 @@ import { Text, Divider } from 'react-native-paper';
 import FormField from '../FormField';
 import { SectionProps } from '../types';
 
+const TITLE_OPTIONS = ['Madame', 'Monsieur', 'Autre'];
+const SEXE_OPTIONS = ['Masculin', 'Féminin', 'O'];
+
 const InfosPersonnellesSection: React.FC<SectionProps> = ({
     formData,
     errors,
@@ -11,6 +14,11 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
     focusFieldId,
     focusRequestId,
 }) => {
+    const focusProps = (id: string) => ({
+        autoFocus: focusFieldId === id,
+        focusRequestId,
+    });
+
     return (
         <>
             <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Informations personnelles</Text>
@@ -22,13 +30,8 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 type="select"
                 value={formData.titre}
                 onChange={handleChange}
-                autoFocus={focusFieldId === 'titre'}
-                focusRequestId={focusRequestId}
-                options={[
-                    'Madame',
-                    'Monsieur',
-                    'Autre',
-                ]}
+                options={TITLE_OPTIONS}
+                {...focusProps('titre')}
             />
 
             <FormField
@@ -40,8 +43,7 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 onBlur={() => handleBlur('nomVol')}
                 required
                 error={errors.nomVol}
-                autoFocus={focusFieldId === 'nomVol'}
-                focusRequestId={focusRequestId}
+                {...focusProps('nomVol')}
             />
 
             <FormField
@@ -53,8 +55,7 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 onBlur={() => handleBlur('prenomVol')}
                 required
                 error={errors.prenomVol}
-                autoFocus={focusFieldId === 'prenomVol'}
-                focusRequestId={focusRequestId}
+                {...focusProps('prenomVol')}
             />
 
             <FormField
@@ -66,8 +67,7 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 onBlur={() => handleBlur('email')}
                 required
                 error={errors.email}
-                autoFocus={focusFieldId === 'email'}
-                focusRequestId={focusRequestId}
+                {...focusProps('email')}
             />
 
             <FormField
@@ -79,8 +79,7 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 onBlur={() => handleBlur('telephone')}
                 required
                 error={errors.telephone}
-                autoFocus={focusFieldId === 'telephone'}
-                focusRequestId={focusRequestId}
+                {...focusProps('telephone')}
             />
 
             <FormField
@@ -101,8 +100,7 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 onBlur={() => handleBlur('dateNaissance')}
                 required
                 error={errors.dateNaissance}
-                autoFocus={focusFieldId === 'dateNaissance'}
-                focusRequestId={focusRequestId}
+                {...focusProps('dateNaissance')}
             />
 
             <FormField
@@ -114,13 +112,8 @@ const InfosPersonnellesSection: React.FC<SectionProps> = ({
                 onBlur={() => handleBlur('sexe')}
                 required
                 error={errors.sexe}
-                autoFocus={focusFieldId === 'sexe'}
-                focusRequestId={focusRequestId}
-                options={[
-                    'Masculin',
-                    'Féminin',
-                    'O',
-                ]}
+                options={SEXE_OPTIONS}
+                {...focusProps('sexe')}
             />
 
             <Divider style={{ marginVertical: 12 }} />

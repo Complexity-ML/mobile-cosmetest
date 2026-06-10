@@ -3,6 +3,29 @@ import { Text, Divider } from 'react-native-paper';
 import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
+const CHECKBOX_GROUPS = [
+    {
+        title: 'Vergetures',
+        fields: [
+            { label: 'Jambes', id: 'vergeturesJambes' },
+            { label: 'Fesses / Hanches', id: 'vergeturesFessesHanches' },
+            { label: 'Ventre / Taille', id: 'vergeturesVentreTaille' },
+            { label: 'Poitrine / Décolleté', id: 'vergeturesPoitrineDecollete' },
+        ],
+    },
+    {
+        title: 'Taches pigmentaires',
+        fields: [
+            { label: 'Visage', id: 'tachesPigmentairesVisage' },
+            { label: 'Cou', id: 'tachesPigmentairesCou' },
+            { label: 'Décolleté', id: 'tachesPigmentairesDecollete' },
+            { label: 'Mains', id: 'tachesPigmentairesMains' },
+        ],
+    },
+] as const;
+
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const MarquesCutaneesSection: React.FC<SectionProps> = ({
     formData,
     handleChange,
@@ -12,20 +35,22 @@ const MarquesCutaneesSection: React.FC<SectionProps> = ({
             <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Marques cutanées</Text>
             <Divider style={{ marginBottom: 12 }} />
 
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Vergetures</Text>
+            {CHECKBOX_GROUPS.map((group, index) => (
+                <React.Fragment key={group.title}>
+                    {index > 0 && <Divider style={{ marginVertical: 12 }} />}
+                    <Text variant="titleMedium" style={{ marginBottom: 8 }}>{group.title}</Text>
 
-            <CheckboxField label="Jambes" id="vergeturesJambes" checked={formData.vergeturesJambes === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Fesses / Hanches" id="vergeturesFessesHanches" checked={formData.vergeturesFessesHanches === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Ventre / Taille" id="vergeturesVentreTaille" checked={formData.vergeturesVentreTaille === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Poitrine / Décolleté" id="vergeturesPoitrineDecollete" checked={formData.vergeturesPoitrineDecollete === 'Oui'} onChange={handleChange} />
-
-            <Divider style={{ marginVertical: 12 }} />
-            <Text variant="titleMedium" style={{ marginBottom: 8 }}>Taches pigmentaires</Text>
-
-            <CheckboxField label="Visage" id="tachesPigmentairesVisage" checked={formData.tachesPigmentairesVisage === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Cou" id="tachesPigmentairesCou" checked={formData.tachesPigmentairesCou === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Décolleté" id="tachesPigmentairesDecollete" checked={formData.tachesPigmentairesDecollete === 'Oui'} onChange={handleChange} />
-            <CheckboxField label="Mains" id="tachesPigmentairesMains" checked={formData.tachesPigmentairesMains === 'Oui'} onChange={handleChange} />
+                    {group.fields.map((field) => (
+                        <CheckboxField
+                            key={field.id}
+                            label={field.label}
+                            id={field.id}
+                            checked={isYes(formData[field.id])}
+                            onChange={handleChange}
+                        />
+                    ))}
+                </React.Fragment>
+            ))}
         </>
     );
 };

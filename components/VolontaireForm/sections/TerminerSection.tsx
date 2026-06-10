@@ -9,10 +9,13 @@ interface TerminerSectionProps extends SectionProps {
   isSaving?: boolean;
 }
 
+const EMPTY_VALUE = '—';
+const isYes = (value?: string) => value?.toLowerCase() === 'oui';
+
 const Line = ({ label, value }: { label: string; value: any }) => (
   <View style={styles.line}>
     <Text style={styles.label}>{label}</Text>
-    <Text style={styles.value}>{value || '—'}</Text>
+    <Text style={styles.value}>{value || EMPTY_VALUE}</Text>
   </View>
 );
 
@@ -22,7 +25,7 @@ const TerminerSection: React.FC<TerminerSectionProps> = ({
   onCancel,
   isSaving,
 }) => {
-  const name = `${formData.prenomVol || ''} ${formData.nomVol || ''}`.trim() || '—';
+  const name = `${formData.prenomVol || ''} ${formData.nomVol || ''}`.trim() || EMPTY_VALUE;
 
   return (
     <View>
@@ -57,14 +60,14 @@ const TerminerSection: React.FC<TerminerSectionProps> = ({
 
       <Text variant="titleMedium" style={styles.sectionTitle}>Médecine esthétique</Text>
       <Line label="Injections visage" value={formData.injectionsVisage} />
-      {formData.injectionsVisage === 'Oui' && (
+      {isYes(formData.injectionsVisage) && (
         <>
           <Line label="Zone" value={formData.injectionsVisageZone} />
           <Line label="Dernière injection" value={formData.injectionsVisageDate} />
         </>
       )}
       <Line label="Maquillage permanent visage" value={formData.maquillagePermanentVisage} />
-      {formData.maquillagePermanentVisage === 'Oui' && (
+      {isYes(formData.maquillagePermanentVisage) && (
         <>
           <Line label="Zone" value={formData.maquillagePermanentVisageZone} />
           <Line label="Dernière réalisation" value={formData.maquillagePermanentVisageDate} />

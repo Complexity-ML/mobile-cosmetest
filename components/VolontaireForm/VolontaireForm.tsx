@@ -25,6 +25,61 @@ type NavProps = {
     VolontaireDetails: { id: string };
 };
 
+const normalizeKey = (value: any) =>
+    String(value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
+const normalizeOption = (value: any, aliases: Record<string, string>) => {
+    if (value === undefined || value === null || value === '') return value;
+    return aliases[normalizeKey(value)] ?? value;
+};
+
+const normalizeHairColor = (value: any) => normalizeOption(value, {
+    blond: 'Blond',
+    blonds: 'Blond',
+    brun: 'Brun',
+    bruns: 'Brun',
+    chatain: 'Châtain',
+    chatains: 'Châtain',
+    noir: 'Noir',
+    noirs: 'Noir',
+    blanc: 'Blanc',
+    blancs: 'Blanc',
+    colores: 'Colorés',
+});
+
+const normalizeHairNature = (value: any) => normalizeOption(value, {
+    lisse: 'Lisse',
+    lisses: 'Lisse',
+    ondule: 'Ondulé',
+    ondules: 'Ondulé',
+    boucle: 'Bouclé',
+    boucles: 'Bouclé',
+    crepu: 'Crêpu',
+    crepus: 'Crêpu',
+    frise: 'Frisé',
+    frises: 'Frisé',
+});
+
+const normalizeLashCurve = (value: any) => normalizeOption(value, {
+    droit: 'Droit',
+    droits: 'Droit',
+    courbe: 'Courbé',
+    courbes: 'Courbé',
+});
+
+const normalizeSousEthnie = (value: any) => {
+    if (!value) return value;
+    return String(value)
+        .split(',')
+        .map(item => item.trim() === 'MEDITERRANEEN' ? 'MEDITERRANEEN/MAGHREBIN' : item.trim())
+        .filter(Boolean)
+        .join(',');
+};
+
 const VolontaireForm: React.FC<VolontaireFormProps> = ({
     isEmbedded = false,
     onSubmitSuccess
@@ -75,7 +130,17 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
             setIsLoading(true);
             const response = await api.volontaires.getById(volontaireId);
             if (response.data) {
-                const d = response.data as any;
+                let d = response.data as any;
+                try {
+                    const detailsResponse = await api.volontaires.getDetailsById(volontaireId);
+                    if (detailsResponse.data) {
+                        d = { ...d, ...(detailsResponse.data as any) };
+                    }
+                } catch (detailsError: any) {
+                    if (detailsError?.response?.status !== 404) {
+                        console.warn('Erreur chargement details volontaire:', detailsError);
+                    }
+                }
                 // Map backend -> form keys for edit mode
                 const mapped: any = {
                     ...d,
@@ -94,6 +159,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     dateNaissance: d.dateNaissance ?? '',
                     sexe: d.sexe ?? '',
                     typePeau: d.typePeau ?? d.typePeauVisage ?? '',
+                    sousEthnie: normalizeSousEthnie(d.sousEthnie ?? ''),
+                    demangeaisonsCuirChevelu: d.demangeaisonsCuirChevelu ?? d.demangeaisonsDuCuirChevelu ?? '',
                 };
                 // Charger aussi les habitudes cosmétiques
                 try {
@@ -245,7 +312,7 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 }
                 setIf('phototype', data.phototype);
                 setIf('ethnie', data.ethnie);
-                setIf('sousEthnie', data.sousEthnie);
+                setIf('sousEthnie', normalizeSousEthnie(data.sousEthnie));
                 // Optional: forwarded but currently no backend fields for pays, ignore
                 return out;
             };
@@ -306,11 +373,13 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 put('perteDeFermeteVisage', data.perteDeFermeteVisage);
                 put('perteDeFermeteCou', data.perteDeFermeteCou);
                 put('perteDeFermeteDecollete', data.perteDeFermeteDecollete);
+                put('perteDeFermeteAvantBras', data.perteDeFermeteAvantBras);
 
                 // Marques cutanées
                 put('cicatrices', data.cicatrices);
                 put('tatouages', data.tatouages);
                 put('piercings', data.piercings);
+                put('maquillagePermanent', data.maquillagePermanent);
 
                 // Médecine esthétique
                 put('injectionsVisage', data.injectionsVisage);
@@ -337,20 +406,25 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 }
 
                 // Cheveux
-                put('couleurCheveux', data.couleurCheveux);
-                put('natureCheveux', data.natureCheveux);
+                put('couleurCheveux', normalizeHairColor(data.couleurCheveux));
+                put('natureCheveux', normalizeHairNature(data.natureCheveux));
                 put('longueurCheveux', data.longueurCheveux);
                 put('epaisseurCheveux', data.epaisseurCheveux);
                 put('natureCuirChevelu', data.natureCuirChevelu);
                 put('cuirCheveluSensible', data.cuirCheveluSensible);
                 put('chuteDeCheveux', data.chuteDeCheveux);
                 put('cheveuxCassants', data.cheveuxCassants);
+                put('calvitie', data.calvitie);
+                put('pellicules', data.pellicules);
+                put('demangeaisonsDuCuirChevelu', data.demangeaisonsCuirChevelu ?? data.demangeaisonsDuCuirChevelu);
+                put('onglesCassants', data.onglesCassants);
+                put('onglesDedoubles', data.onglesDedoubles);
 
                 // Cils & sourcils
                 put('cils', data.cils);
                 put('epaisseurCils', data.epaisseurCils);
                 put('longueurCils', data.longueurCils);
-                put('courbureCils', data.courbureCils);
+                put('courbureCils', normalizeLashCurve(data.courbureCils));
                 put('cilsAbimes', data.cilsAbimes);
                 put('cilsBroussailleux', data.cilsBroussailleux);
                 put('chuteDeCils', data.chuteDeCils);
@@ -362,6 +436,8 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 put('poches', data.poches);
                 put('yeux', data.yeux);
                 put('levres', data.levres);
+                put('pilosite', data.pilosite);
+                put('sousEthnie', normalizeSousEthnie(data.sousEthnie));
 
                 // Médical/allergies
                 put('traitement', data.traitement);
