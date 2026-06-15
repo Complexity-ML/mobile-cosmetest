@@ -5,17 +5,19 @@ import { Text } from 'react-native-paper';
 export interface CheckboxFieldProps {
   label: string;
   id: string;
-  checked: boolean;
+  value?: string;
+  checked?: boolean;
   onChange: (id: string, value: 'Oui' | 'Non') => void;
 }
 
-const CheckboxField: React.FC<CheckboxFieldProps> = ({ label, id, checked, onChange }) => {
-  const isOui = checked === true;
-  const isNon = checked === false;
+const CheckboxField: React.FC<CheckboxFieldProps> = ({ label, id, value, checked, onChange }) => {
+  const normalizedValue = value?.toLowerCase();
+  const isOui = normalizedValue === 'oui' || (!value && checked === true);
+  const isNon = normalizedValue === 'non' || (!value && checked === false);
 
   return (
     <View style={styles.row}>
-      <Text style={styles.label} numberOfLines={2}>{label}</Text>
+      <Text style={styles.label}>{label}</Text>
       <View style={styles.buttons}>
         <TouchableOpacity
           onPress={() => onChange(id, 'Oui')}
@@ -39,25 +41,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 6,
+    paddingVertical: 10,
     paddingHorizontal: 4,
+    minHeight: 52,
   },
   label: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
     color: '#374151',
-    marginRight: 12,
+    marginRight: 16,
+    lineHeight: 21,
   },
   buttons: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 8,
   },
   button: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
     borderRadius: 6,
     borderWidth: 1,
-    minWidth: 48,
+    minWidth: 58,
     alignItems: 'center',
   },
   ouiActive: {
@@ -73,7 +77,7 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
   },
   buttonText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
   },
   ouiText: {

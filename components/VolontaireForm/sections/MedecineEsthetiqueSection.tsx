@@ -24,9 +24,9 @@ const MedecineEsthetiqueSection: React.FC<SectionProps> = ({
             </Text>
 
             <CheckboxField
-                label="Oui"
+                label="Réponse"
                 id="injectionsVisage"
-                checked={injectionsActive}
+                value={formData.injectionsVisage}
                 onChange={(_id, value) => handleChange('injectionsVisage', value === 'Oui' ? 'Oui' : 'Non')}
             />
 
@@ -57,9 +57,9 @@ const MedecineEsthetiqueSection: React.FC<SectionProps> = ({
             </Text>
 
             <CheckboxField
-                label="Oui"
+                label="Réponse"
                 id="maquillagePermanentVisage"
-                checked={maquillageActive}
+                value={formData.maquillagePermanentVisage}
                 onChange={(_id, value) => handleChange('maquillagePermanentVisage', value === 'Oui' ? 'Oui' : 'Non')}
             />
 

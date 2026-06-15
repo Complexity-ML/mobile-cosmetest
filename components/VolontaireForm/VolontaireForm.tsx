@@ -102,6 +102,28 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
 
     const { formData, setFormData, errors, setErrors, handleChange, handleBlur, clearErrors } = useFormData();
     const { activeTab, setActiveTab, tabs } = useFormTabs();
+    const activeTabIndex = Math.max(0, tabs.findIndex((tab) => tab.id === activeTab));
+    const isFirstTab = activeTabIndex === 0;
+    const isLastTab = activeTabIndex === tabs.length - 1;
+
+    const changeTab = (tabId: TabId) => {
+        setActiveTab(tabId);
+        setFocusFieldId(undefined);
+        setTimeout(() => scrollViewRef.current?.scrollTo({ y: 0, animated: true }), 50);
+    };
+
+    const goToPreviousTab = () => {
+        if (isFirstTab) return;
+        changeTab(tabs[activeTabIndex - 1].id);
+    };
+
+    const goToNextTab = () => {
+        if (isLastTab) {
+            handleSubmit();
+            return;
+        }
+        changeTab(tabs[activeTabIndex + 1].id);
+    };
 
     // Orientation listener
     useEffect(() => {
@@ -647,13 +669,13 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                         <FormTabs
                             tabs={tabs}
                             activeTab={activeTab}
-                            setActiveTab={(tabId) => setActiveTab(tabId as TabId)}
+                            setActiveTab={(tabId) => changeTab(tabId as TabId)}
                             orientation="vertical"
                         />
                         <ScrollView
                             ref={scrollViewRef}
                             style={{ flex: 1 }}
-                            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120 }}
+                            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
                             keyboardShouldPersistTaps="handled"
                             keyboardDismissMode="on-drag"
                             showsVerticalScrollIndicator={true}
@@ -669,13 +691,13 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                         <FormTabs
                             tabs={tabs}
                             activeTab={activeTab}
-                            setActiveTab={(tabId) => setActiveTab(tabId as TabId)}
+                            setActiveTab={(tabId) => changeTab(tabId as TabId)}
                             orientation="horizontal"
                         />
                         <ScrollView
                             ref={scrollViewRef}
                             style={{ flex: 1 }}
-                            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120 }}
+                            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
                             keyboardShouldPersistTaps="handled"
                             keyboardDismissMode="on-drag"
                             showsVerticalScrollIndicator={true}
@@ -688,6 +710,41 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     </>
                 )}
 
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 12,
+                        paddingHorizontal: 16,
+                        paddingTop: 12,
+                        paddingBottom: Platform.OS === 'ios' ? 24 : 14,
+                        borderTopWidth: 1,
+                        borderTopColor: '#E5E7EB',
+                        backgroundColor: '#FFFFFF',
+                    }}
+                >
+                    <Button
+                        mode="outlined"
+                        icon="chevron-left"
+                        onPress={goToPreviousTab}
+                        disabled={isFirstTab || isSaving}
+                        style={{ flex: 1, borderRadius: 6 }}
+                        contentStyle={{ minHeight: 46 }}
+                    >
+                        Précédent
+                    </Button>
+                    <Button
+                        mode="contained"
+                        icon={isLastTab ? 'check' : 'chevron-right'}
+                        onPress={goToNextTab}
+                        loading={isLastTab && isSaving}
+                        disabled={isSaving}
+                        style={{ flex: 1, borderRadius: 6, backgroundColor: '#2563EB' }}
+                        contentStyle={{ minHeight: 46, flexDirection: isLastTab ? 'row' : 'row-reverse' }}
+                    >
+                        {isLastTab ? 'Enregistrer' : 'Suivant'}
+                    </Button>
+                </View>
 
                 <Snackbar
                     visible={!!errorMessage}

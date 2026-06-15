@@ -5,8 +5,6 @@ import CheckboxField from '../CheckboxField';
 import { SectionProps } from '../types';
 
 const CONTRACEPTION_OPTIONS = ['Pilule', 'Stérilet', 'Implant', 'Patch', 'Autre', 'Abstinence'];
-const isYes = (value?: string) => value?.toLowerCase() === 'oui';
-
 const MedicalSection: React.FC<SectionProps> = ({
     formData,
     handleChange,
@@ -46,14 +44,14 @@ const MedicalSection: React.FC<SectionProps> = ({
             <CheckboxField
                 label="Ménopause"
                 id="menopause"
-                checked={isYes(formData.menopause)}
+                value={formData.menopause}
                 onChange={handleChange}
             />
 
             <CheckboxField
                 label="Bouffées de chaleur (ménopause)"
                 id="bouffeeChaleurMenaupose"
-                checked={isYes(formData.bouffeeChaleurMenaupose)}
+                value={formData.bouffeeChaleurMenaupose}
                 onChange={handleChange}
             />
 

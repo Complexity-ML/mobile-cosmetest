@@ -89,8 +89,6 @@ const CHECKBOX_GROUPS = [
     },
 ] as const;
 
-const isYes = (value?: string) => value?.toLowerCase() === 'oui';
-
 const PeauSection: React.FC<SectionProps> = ({
     formData,
     errors,
@@ -134,7 +132,7 @@ const PeauSection: React.FC<SectionProps> = ({
                 <CheckboxField
                     label="Teint inhomogène"
                     id="teintInhomogene"
-                    checked={isYes(formData.teintInhomogene)}
+                    value={formData.teintInhomogene}
                     onChange={handleChange}
                 />
                 <Text style={styles.definition}>Couleur / reliefs (grain de beauté, taches, cicatrices...)</Text>
@@ -144,7 +142,7 @@ const PeauSection: React.FC<SectionProps> = ({
                 <CheckboxField
                     label="Teint terne"
                     id="teintTerne"
-                    checked={isYes(formData.teintTerne)}
+                    value={formData.teintTerne}
                     onChange={handleChange}
                 />
                 <Text style={styles.definition}>Manque d'éclat</Text>
@@ -153,7 +151,7 @@ const PeauSection: React.FC<SectionProps> = ({
             <CheckboxField
                 label="Pores visibles"
                 id="poresVisibles"
-                checked={isYes(formData.poresVisibles)}
+                value={formData.poresVisibles}
                 onChange={handleChange}
             />
 
@@ -182,7 +180,7 @@ const PeauSection: React.FC<SectionProps> = ({
                             key={field.id}
                             label={field.label}
                             id={field.id}
-                            checked={isYes(formData[field.id])}
+                            value={formData[field.id]}
                             onChange={handleChange}
                         />
                     ))}

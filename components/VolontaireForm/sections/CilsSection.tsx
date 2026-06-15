@@ -16,8 +16,6 @@ const CILS_PROBLEMES = [
     { label: 'Chute de cils', id: 'chuteDeCils' },
 ] as const;
 
-const isYes = (value?: string) => value?.toLowerCase() === 'oui';
-
 const CilsSection: React.FC<SectionProps> = ({
     formData,
     handleChange,
@@ -48,7 +46,7 @@ const CilsSection: React.FC<SectionProps> = ({
                     key={field.id}
                     label={field.label}
                     id={field.id}
-                    checked={isYes(formData[field.id])}
+                    value={formData[field.id]}
                     onChange={handleChange}
                 />
             ))}

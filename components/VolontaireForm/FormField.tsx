@@ -1,6 +1,6 @@
 // FormField.tsx
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { TextInput as PaperTextInput, HelperText, Text, Button, Dialog, Portal, RadioButton } from 'react-native-paper';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Feather';
@@ -60,6 +60,14 @@ const FormField: React.FC<FormFieldProps> = ({
   const [showSelectDialog, setShowSelectDialog] = useState(false);
   const [selectedOption, setSelectedOption] = useState(value || '');
   const inputRef = React.useRef<any>(null);
+  const getOptionLabel = (optionValue?: string) => {
+    if (!optionValue) return '';
+    const matchingOption = options.find((opt) => {
+      const valueOpt = typeof opt === 'string' ? opt : opt.value;
+      return valueOpt === optionValue;
+    });
+    return typeof matchingOption === 'object' ? matchingOption.label : optionValue;
+  };
 
   // Update selectedOption when value changes
   useEffect(() => {
@@ -103,8 +111,8 @@ const FormField: React.FC<FormFieldProps> = ({
   };
 
   return (
-    <View style={{ marginBottom: 16 }}>
-      <Text>
+    <View style={{ marginBottom: 18 }}>
+      <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 6 }}>
         {label}
         {required && ' *'}
       </Text>
@@ -120,11 +128,12 @@ const FormField: React.FC<FormFieldProps> = ({
             <PaperTextInput
               ref={inputRef}
               mode="outlined"
-              value={value || ''}
+              value={getOptionLabel(value)}
               placeholder={placeholder || 'Sélectionner...'}
               right={<PaperTextInput.Icon icon="chevron-down" />}
               editable={false}
               error={!!error}
+              style={{ backgroundColor: '#FFFFFF' }}
             />
           </TouchableOpacity>
 
@@ -132,30 +141,34 @@ const FormField: React.FC<FormFieldProps> = ({
             <Dialog visible={showSelectDialog} onDismiss={() => setShowSelectDialog(false)}>
               <Dialog.Title>{label}</Dialog.Title>
               <Dialog.Content>
-                <RadioButton.Group
-                  onValueChange={(newValue) => setSelectedOption(newValue)}
-                  value={selectedOption}
-                >
-                  {(options || []).map((opt, idx) => {
-                    const labelOpt = typeof opt === 'string' ? opt : (opt as any).label;
-                    const valueOpt = typeof opt === 'string' ? opt : (opt as any).value;
-                    return (
-                      <View key={`${valueOpt}-${idx}`}>
-                        <RadioButton.Item
-                          label={labelOpt}
-                          value={valueOpt}
-                        />
-                      </View>
-                    );
-                  })}
-                </RadioButton.Group>
+                <ScrollView style={{ maxHeight: 360 }}>
+                  <RadioButton.Group
+                    onValueChange={(newValue) => {
+                      setSelectedOption(newValue);
+                      onChange(id, newValue);
+                      setShowSelectDialog(false);
+                    }}
+                    value={selectedOption}
+                  >
+                    {(options || []).map((opt, idx) => {
+                      const labelOpt = typeof opt === 'string' ? opt : (opt as any).label;
+                      const valueOpt = typeof opt === 'string' ? opt : (opt as any).value;
+                      return (
+                        <View key={`${valueOpt}-${idx}`}>
+                          <RadioButton.Item
+                            label={labelOpt}
+                            value={valueOpt}
+                            labelStyle={{ fontSize: 16 }}
+                            style={{ minHeight: 50, paddingVertical: 4 }}
+                          />
+                        </View>
+                      );
+                    })}
+                  </RadioButton.Group>
+                </ScrollView>
               </Dialog.Content>
               <Dialog.Actions>
-                <Button onPress={() => setShowSelectDialog(false)}>Annuler</Button>
-                <Button onPress={() => {
-                  onChange(id, selectedOption);
-                  setShowSelectDialog(false);
-                }}>OK</Button>
+                <Button onPress={() => setShowSelectDialog(false)}>Fermer</Button>
               </Dialog.Actions>
             </Dialog>
           </Portal>
@@ -177,6 +190,7 @@ const FormField: React.FC<FormFieldProps> = ({
               right={<PaperTextInput.Icon icon="calendar" />}
               editable={false}
               error={!!error}
+              style={{ backgroundColor: '#FFFFFF' }}
             />
           </TouchableOpacity>
           {showDatePicker && (
@@ -203,6 +217,7 @@ const FormField: React.FC<FormFieldProps> = ({
             placeholder={placeholder}
             multiline
             numberOfLines={numberOfLines}
+            style={{ backgroundColor: '#FFFFFF' }}
           />
           {!!error && (
             <HelperText type="error" visible={true}>
@@ -221,6 +236,7 @@ const FormField: React.FC<FormFieldProps> = ({
             placeholder={placeholder}
             keyboardType={type === 'number' ? 'numeric' : 'default'}
             error={!!error}
+            style={{ backgroundColor: '#FFFFFF' }}
           />
           {!!error && (
             <HelperText type="error" visible={true}>

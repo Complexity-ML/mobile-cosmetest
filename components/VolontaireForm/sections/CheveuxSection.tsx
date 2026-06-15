@@ -48,8 +48,6 @@ const CHECKBOX_GROUPS = [
     },
 ] as const;
 
-const isYes = (value?: string) => value?.toLowerCase() === 'oui';
-
 const CheveuxSection: React.FC<SectionProps> = ({
     formData,
     handleChange,
@@ -85,7 +83,7 @@ const CheveuxSection: React.FC<SectionProps> = ({
                             key={field.id}
                             label={field.label}
                             id={field.id}
-                            checked={isYes(formData[field.id])}
+                            value={formData[field.id]}
                             onChange={handleChange}
                         />
                     ))}
