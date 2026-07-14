@@ -5,6 +5,7 @@ import api from "./services/apiService";
 import tokenStorage from "./services/tokenStorage";
 import { PaperProvider } from 'react-native-paper';
 import paperTheme from '../theme/paperTheme';
+import logger from './services/logger';
 
 // Écran de chargement pendant la vérification de l'authentification
 const SplashScreen = () => (
@@ -30,8 +31,8 @@ export default function RootLayout() {
           const result = await api.validateToken();
           setIsAuthenticated(result.valid);
         }
-      } catch (error) {
-        console.error("Erreur lors de la vérification de l'authentification:", error);
+      } catch {
+        logger.error("Erreur lors de la vérification de l'authentification");
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);

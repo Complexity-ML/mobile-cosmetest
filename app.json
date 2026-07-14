@@ -18,8 +18,7 @@
         "backgroundColor": "#ffffff",
         "monochromeImage": "./assets/images/adaptive-icon.png"
       },
-      "package": "com.boris.peyriguere.Questionnaire",
-      "usesCleartextTraffic": true
+      "package": "com.boris.peyriguere.Questionnaire"
     },
     "web": {
       "bundler": "metro",
@@ -42,11 +41,11 @@
         {
           "android": {
             "enablePngCrunchInReleaseBuilds": false,
-            "usesCleartextTraffic": true,
-            "networkSecurityConfig": "network_security_config"
+            "usesCleartextTraffic": true
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

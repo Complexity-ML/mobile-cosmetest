@@ -48,12 +48,12 @@ export default function LoginScreen() {
       setLoading(true);
       setError("");
 
-      logger.info("Tentative de connexion", identifiant);
+      logger.info("Tentative de connexion");
 
       // Appel à l'API pour se connecter
       const response = await api.login(identifiant, password);
       
-      logger.debug("Réponse du serveur", response.data);
+      logger.debug("Connexion acceptée");
       
       // Le stockage est désormais géré dans la méthode login de apiService
       // qui stocke le token à la fois dans les cookies et dans AsyncStorage
@@ -62,7 +62,7 @@ export default function LoginScreen() {
       router.replace("/");
       
     } catch (error) {
-      logger.error("Erreur de connexion:", error);
+      logger.error("Échec de la connexion");
       
       // Afficher un message d'erreur approprié
       if (

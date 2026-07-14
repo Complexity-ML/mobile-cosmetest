@@ -14,13 +14,21 @@ const ACCESS_TOKEN_KEY = 'authToken';
 
 let accessTokenMemory: string | null = null;
 
-const useSecureStore = () => Platform.OS !== 'web' && SecureStore && 'setItemAsync' in SecureStore;
+const canUseSecureStore = () => Platform.OS !== 'web' && SecureStore && 'setItemAsync' in SecureStore;
+
+const assertNativeSecureStore = () => {
+  if (Platform.OS !== 'web' && !canUseSecureStore()) {
+    throw new Error('Le stockage sécurisé natif est indisponible.');
+  }
+};
 
 export async function setAccessToken(token: string): Promise<void> {
+  assertNativeSecureStore();
   accessTokenMemory = token;
-  if (useSecureStore()) {
+  if (canUseSecureStore()) {
     await (SecureStore as any).setItemAsync(ACCESS_TOKEN_KEY, token, {
       keychainService: ACCESS_TOKEN_KEY,
+      keychainAccessible: (SecureStore as any).WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     });
   } else {
     await AsyncStorage.setItem(ACCESS_TOKEN_KEY, token);
@@ -28,9 +36,10 @@ export async function setAccessToken(token: string): Promise<void> {
 }
 
 export async function getAccessToken(): Promise<string | null> {
+  assertNativeSecureStore();
   if (accessTokenMemory) return accessTokenMemory;
   let token: string | null;
-  if (useSecureStore()) {
+  if (canUseSecureStore()) {
     token = await (SecureStore as any).getItemAsync(ACCESS_TOKEN_KEY);
   } else {
     token = await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
@@ -45,8 +54,9 @@ export function getAccessTokenSync(): string | null {
 }
 
 export async function clearAccessToken(): Promise<void> {
+  assertNativeSecureStore();
   accessTokenMemory = null;
-  if (useSecureStore()) {
+  if (canUseSecureStore()) {
     await (SecureStore as any).deleteItemAsync(ACCESS_TOKEN_KEY, {
       keychainService: ACCESS_TOKEN_KEY,
     });

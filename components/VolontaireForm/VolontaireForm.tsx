@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView, Alert, KeyboardAvoidingView, Platform, SafeAreaView, View, Dimensions } from 'react-native';
+import { ScrollView, Alert, KeyboardAvoidingView, Platform, SafeAreaView, View, Text, Dimensions } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { Button, Snackbar, ActivityIndicator } from 'react-native-paper';
+import { router } from 'expo-router';
+import { Button, Snackbar, ActivityIndicator, Dialog, Portal, TextInput as PaperTextInput } from 'react-native-paper';
 import api from '../../app/services/apiService';
+import logger from '../../app/services/logger';
 import FormTabs from './FormTabs';
 import { useFormData } from './hooks/useFormData';
 import { useFormTabs } from './hooks/useFormTabs';
@@ -99,6 +101,11 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [focusFieldId, setFocusFieldId] = useState<string | undefined>(undefined);
     const [focusRequestId, setFocusRequestId] = useState<number>(0);
+    const [sessionExpired, setSessionExpired] = useState(false);
+    const [reauthLogin, setReauthLogin] = useState('');
+    const [reauthPassword, setReauthPassword] = useState('');
+    const [isReauthenticating, setIsReauthenticating] = useState(false);
+    const [reauthError, setReauthError] = useState<string | null>(null);
 
     const { formData, setFormData, errors, setErrors, handleChange, handleBlur, clearErrors } = useFormData();
     const { activeTab, setActiveTab, tabs } = useFormTabs();
@@ -125,6 +132,26 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
         changeTab(tabs[activeTabIndex + 1].id);
     };
 
+    const handleReauthenticate = async () => {
+        if (!reauthLogin.trim() || !reauthPassword) {
+            setReauthError('Identifiant et mot de passe requis');
+            return;
+        }
+        try {
+            setIsReauthenticating(true);
+            setReauthError(null);
+            await api.login(reauthLogin.trim(), reauthPassword);
+            setSessionExpired(false);
+            setReauthPassword('');
+            setErrorMessage(null);
+            setSuccessMessage('Session renouvelée. Vos données sont conservées; vous pouvez enregistrer.');
+        } catch {
+            setReauthError('Identifiant ou mot de passe incorrect');
+        } finally {
+            setIsReauthenticating(false);
+        }
+    };
+
     // Orientation listener
     useEffect(() => {
         const onChange = ({ window }: { window: { width: number; height: number } }) => {
@@ -140,11 +167,31 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
         };
     }, []);
 
-    // Load existing data if editing
+    // Pendant la saisie, un 401 ne doit jamais remplacer le formulaire par
+    // l'écran de connexion et faire perdre les données locales.
     useEffect(() => {
-        if (isEditMode && id) {
-            loadVolontaireData(id);
-        }
+        api.setAuthRedirectSuspended(true);
+        return () => api.setAuthRedirectSuspended(false);
+    }, []);
+
+    // Valider la session avant tout chargement métier. Un token déjà expiré
+    // mène ainsi au login avant que le formulaire soit utilisable.
+    useEffect(() => {
+        const initializeForm = async () => {
+            setIsLoading(true);
+            const auth = await api.validateToken();
+            if (!auth.valid) {
+                api.setAuthRedirectSuspended(false);
+                router.replace('/login');
+                return;
+            }
+            if (isEditMode && id) {
+                await loadVolontaireData(id);
+            } else {
+                setIsLoading(false);
+            }
+        };
+        initializeForm();
     }, [id, isEditMode]);
 
     const loadVolontaireData = async (volontaireId: string) => {
@@ -160,7 +207,7 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     }
                 } catch (detailsError: any) {
                     if (detailsError?.response?.status !== 404) {
-                        console.warn('Erreur chargement details volontaire:', detailsError);
+                        logger.warn('Erreur chargement détails volontaire');
                     }
                 }
                 // Map backend -> form keys for edit mode
@@ -201,14 +248,19 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     }
                 } catch (hcError: any) {
                     if (hcError?.response?.status !== 404) {
-                        console.warn('Erreur chargement habitudes cosmétiques:', hcError);
+                        logger.warn('Erreur chargement habitudes cosmétiques');
                     }
                 }
 
                 setFormData(mapped);
             }
-        } catch (error) {
-            console.error('Erreur lors du chargement des données:', error);
+        } catch (error: any) {
+            if (error?.response?.status === 401) {
+                api.setAuthRedirectSuspended(false);
+                router.replace('/login');
+                return;
+            }
+            logger.error('Erreur lors du chargement des données');
             setErrorMessage('Erreur lors du chargement des données du volontaire');
         } finally {
             setIsLoading(false);
@@ -417,6 +469,12 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 put('vergeturesVentreTaille', data.vergeturesVentreTaille);
                 put('vergeturesPoitrineDecollete', data.vergeturesPoitrineDecollete);
 
+                // Cellulite
+                put('celluliteBras', data.celluliteBras);
+                put('celluliteFessesHanches', data.celluliteFessesHanches);
+                put('celluliteJambes', data.celluliteJambes);
+                put('celluliteVentreTaille', data.celluliteVentreTaille);
+
                 // Mesures (nombres)
                 if (data.ihBrasDroit && String(data.ihBrasDroit).trim() !== '') {
                     const n = parseFloat(String(data.ihBrasDroit));
@@ -527,14 +585,13 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                     const idStr = String(createdId);
                     const detailsPayload = toVolontaireDetailDTO(formData, idStr);
                     if (Object.keys(detailsPayload).length > 0) {
-                        if (isEditMode) {
-                            await api.volontaires.updateDetails(idStr, detailsPayload);
-                        } else {
-                            await api.volontaires.createDetails(detailsPayload);
-                        }
+                        // Toujours enrichir l'ID technique existant. POST /details crée
+                        // un second volontaire et ne doit pas être utilisé ici.
+                        await api.volontaires.updateDetails(idStr, detailsPayload);
                     }
-                } catch (e) {
-                    console.warn('Sauvegarde des détails du volontaire échouée:', e);
+                } catch (error) {
+                    logger.warn('Sauvegarde des détails du volontaire échouée');
+                    throw error;
                 }
                 // Sauvegarder les habitudes cosmétiques
                 try {
@@ -565,11 +622,11 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                             if (v === 'oui' || v === 'Oui') hcData[k] = 'oui';
                             else hcData[k] = 'non';
                         }
-                        try { await api.habituesCosmetiques.delete(parseInt(idStr, 10)); } catch (_) {}
                         await api.habituesCosmetiques.create(hcData);
                     }
-                } catch (e) {
-                    console.warn('Sauvegarde des habitudes cosmétiques échouée:', e);
+                } catch (error) {
+                    logger.warn('Sauvegarde des habitudes cosmétiques échouée');
+                    throw error;
                 }
 
                 setSuccessMessage(isEditMode ? 'Volontaire mis à jour avec succès!' : 'Volontaire créé avec succès!');
@@ -584,8 +641,18 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 setSuccessMessage('Volontaire créé. ID non détecté.');
             }
         } catch (error: any) {
-            console.error('Erreur lors de la sauvegarde:', error);
-            const serverMsg: string = error?.response?.data?.message || error?.response?.data || error?.message || 'Erreur lors de la sauvegarde';
+            logger.error('Erreur lors de la sauvegarde');
+            const status = error?.response?.status;
+            const serverMsg = status === 401
+                ? 'Session expirée. Vos données restent affichées. Reconnectez-vous avant d’enregistrer.'
+                : status === 400
+                    ? 'Certaines données sont invalides. Vérifiez les champs du formulaire.'
+                    : status === 409
+                        ? 'Ces données entrent en conflit avec une fiche existante.'
+                        : 'Erreur lors de la sauvegarde. Veuillez réessayer.';
+            if (status === 401) {
+                setSessionExpired(true);
+            }
             setErrorMessage(serverMsg);
 
             // Essaye de cibler le champ mentionné dans le message serveur
@@ -762,6 +829,47 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                 >
                     {successMessage || ''}
                 </Snackbar>
+
+                <Portal>
+                    <Dialog visible={sessionExpired} dismissable={false}>
+                        <Dialog.Title>Session expirée</Dialog.Title>
+                        <Dialog.Content>
+                            <Text style={{ marginBottom: 12 }}>
+                                Le formulaire reste affiché et aucune saisie n'est perdue.
+                            </Text>
+                            <PaperTextInput
+                                label="Identifiant"
+                                value={reauthLogin}
+                                onChangeText={setReauthLogin}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                disabled={isReauthenticating}
+                            />
+                            <PaperTextInput
+                                label="Mot de passe"
+                                value={reauthPassword}
+                                onChangeText={setReauthPassword}
+                                secureTextEntry
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                disabled={isReauthenticating}
+                                style={{ marginTop: 12 }}
+                            />
+                            {reauthError ? (
+                                <Text style={{ color: '#DC2626', marginTop: 12 }}>{reauthError}</Text>
+                            ) : null}
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button
+                                onPress={handleReauthenticate}
+                                loading={isReauthenticating}
+                                disabled={isReauthenticating}
+                            >
+                                Se reconnecter sans perdre la saisie
+                            </Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );

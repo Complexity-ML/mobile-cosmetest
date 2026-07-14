@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { View, StyleSheet, SafeAreaView } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import Icon from "react-native-vector-icons/Feather";
+
 import { Appbar } from 'react-native-paper';
 
 // Importez votre composant VolontaireForm
@@ -10,14 +10,17 @@ import VolontaireForm from "../components/VolontaireForm/VolontaireForm";
 export default function VolontairePage() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const id = params.id as string | undefined;
+  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const id = typeof rawId === 'string' && /^\d+$/.test(rawId) && Number(rawId) > 0
+    ? rawId
+    : undefined;
 
   // Pas d'id = pas de volontaire pré-inscrit → rediriger
   React.useEffect(() => {
     if (!id) {
       router.replace("/pre-inscription" as any);
     }
-  }, [id]);
+  }, [id, router]);
 
   const handleClose = () => {
     router.back();

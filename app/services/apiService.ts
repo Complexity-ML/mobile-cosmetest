@@ -1,12 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
 import { router } from 'expo-router';
-import Constants from 'expo-constants';
 import tokenStorage from './tokenStorage';
 import logger from './logger';
+import { resolveApiBaseUrl } from './apiConfig';
 
 
 // Configuration de base d'axios
-const baseURL = (Constants?.expoConfig as any)?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL || 'http://192.168.127.36:8888';
+const baseURL = resolveApiBaseUrl();
 
 export const API: AxiosInstance = axios.create({
   baseURL,
@@ -57,6 +57,11 @@ API.interceptors.request.use(
 );
 
 let isRedirectingToLogin = false;
+let isAuthRedirectSuspended = false;
+
+const setAuthRedirectSuspended = (suspended: boolean) => {
+  isAuthRedirectSuspended = suspended;
+};
 
 // Add response interceptor for error handling
 API.interceptors.response.use(
@@ -65,26 +70,25 @@ API.interceptors.response.use(
     logger.warn('API Error:', error.message);
 
     // Vérifier si l'erreur est due à un token invalide (401 Unauthorized)
-    if (error.response && error.response.status === 401 && !isRedirectingToLogin) {
-      logger.info('Token invalide - Redirection vers la page de connexion');
-      isRedirectingToLogin = true;
-
-      // Supprimer le token
+    if (error.response && error.response.status === 401) {
       await tokenStorage.clearAccessToken();
       delete API.defaults.headers.common['Authorization'];
 
-      // Rediriger vers la page de connexion en utilisant expo-router
-      router.replace('/login');
-
-      // Réinitialiser le drapeau de redirection après un court délai
-      setTimeout(() => {
-        isRedirectingToLogin = false;
-      }, 2000);
+      // Un formulaire commencé garde l'utilisateur sur place afin de ne pas
+      // perdre sa saisie. Les écrans non protégés redirigent normalement.
+      if (!isAuthRedirectSuspended && !isRedirectingToLogin) {
+        logger.info('Token invalide - Redirection vers la page de connexion');
+        isRedirectingToLogin = true;
+        router.replace('/login');
+        setTimeout(() => {
+          isRedirectingToLogin = false;
+        }, 2000);
+      }
     }
 
     if (error.response) {
       logger.debug('Status:', error.response.status);
-      logger.debug('Data:', error.response.data);
+      logger.debug('Réponse API en erreur reçue');
     } else if (error.request) {
       logger.debug('No response received');
     }
@@ -115,10 +119,6 @@ const volontairesApi = {
     return API.post('/api/volontaires', volontaireData);
   },
 
-  // Créer les détails d'un volontaire
-  createDetails: (detailsData: any) => {
-    return API.post('/api/volontaires/details', detailsData);
-  },
 
   // Mettre à jour un volontaire
   update: (id: string | number, volontaireData: any) => {
@@ -183,10 +183,6 @@ const habituesCosmetiquesApi = {
     return API.patch(`/api/volontaires-hc/volontaire/${idVol}/produit`, produitData);
   },
 
-  // Supprimer les habitudes cosmétiques d'un volontaire
-  delete: (idVol: string | number) => {
-    return API.delete(`/api/volontaires-hc/volontaire/${idVol}`);
-  }
 };
 
 // Add a connection test function
@@ -221,12 +217,13 @@ export default {
   volontaires: volontairesApi,
   habituesCosmetiques: habituesCosmetiquesApi,
   setAuthToken, // Exporter la fonction setAuthToken
+  setAuthRedirectSuspended,
   testConnection, // Export the test function
 
   // Méthode pour gérer la connexion
   login: async (login: string, password: string) => {
     try {
-      logger.info(`Tentative de connexion avec: ${login}`);
+      logger.info('Tentative de connexion');
       const response = await API.post('/api/auth/login', {
         login: login,
         motDePasse: password
@@ -238,32 +235,24 @@ export default {
       }
       return response;
     } catch (error) {
-      logger.error('Erreur de connexion:', error);
-      if (typeof error === 'object' && error !== null && 'response' in error) {
-        logger.debug('Réponse d\'erreur:', (error as any).response.data);
-      } else if (typeof error === 'object' && error !== null && 'request' in error) {
-        logger.debug('Aucune réponse reçue');
-      } else if (typeof error === 'object' && error !== null && 'message' in error) {
-        logger.debug('Erreur de configuration:', (error as any).message);
-      } else {
-        logger.debug('Erreur inconnue:', error as any);
-      }
+      logger.error('Erreur de connexion');
       throw error;
     }
   },
 
   // Méthode pour la déconnexion
   logout: async () => {
+    let serverLogoutSucceeded = true;
     try {
       await API.post('/api/auth/logout');
-      // Supprimer le token
+    } catch {
+      serverLogoutSucceeded = false;
+      logger.warn('Déconnexion serveur impossible; session locale supprimée');
+    } finally {
       await tokenStorage.clearAccessToken();
       delete API.defaults.headers.common['Authorization'];
-      return true;
-    } catch (error) {
-      logger.error('Erreur lors de la déconnexion:', error);
-      return false;
     }
+    return serverLogoutSucceeded;
   },
 
   // Méthode pour tester le token
