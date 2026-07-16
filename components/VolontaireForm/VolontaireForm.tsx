@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollView, Alert, KeyboardAvoidingView, Platform, SafeAreaView, View, Text, Dimensions } from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform, SafeAreaView, View, Text, Dimensions } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { Button, Snackbar, ActivityIndicator, Dialog, Portal, TextInput as PaperTextInput } from 'react-native-paper';
@@ -23,9 +23,6 @@ import {
     TerminerSection,
 } from './sections';
 
-type NavProps = {
-    VolontaireDetails: { id: string };
-};
 
 const normalizeKey = (value: any) =>
     String(value ?? '')
@@ -657,7 +654,7 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
 
             // Essaye de cibler le champ mentionné dans le message serveur
             const msg = (serverMsg || '').toLowerCase();
-            const candidates: Array<{ key: string; tab: TabId; needles: string[] }> = [
+            const candidates: { key: string; tab: TabId; needles: string[] }[] = [
                 { key: 'nomVol', tab: 'infos-personnelles', needles: ['nom', 'nomvol'] },
                 { key: 'prenomVol', tab: 'infos-personnelles', needles: ['prénom', 'prenom', 'prenomvol', 'prénomvol'] },
                 { key: 'email', tab: 'infos-personnelles', needles: ['email', 'e-mail'] },
@@ -705,9 +702,22 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
             case 'medecine-esthetique':
                 return <MedecineEsthetiqueSection {...sectionProps} />;
             case 'habitudes-cosmetiques':
-                return <HabitudesCosmetiquesSection {...sectionProps} />;
+                return (
+                    <HabitudesCosmetiquesSection
+                        {...sectionProps}
+                        onPageChange={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}
+                    />
+                );
             case 'terminer':
-                return <TerminerSection {...sectionProps} onSubmit={handleSubmit} onCancel={() => navigation.goBack()} isSaving={isSaving} />;
+                return (
+                    <TerminerSection
+                        {...sectionProps}
+                        onSubmit={handleSubmit}
+                        onCancel={() => navigation.goBack()}
+                        onEditSection={changeTab}
+                        isSaving={isSaving}
+                    />
+                );
             default:
                 return <InfosPersonnellesSection {...sectionProps} />;
         }
@@ -795,8 +805,9 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                         icon="chevron-left"
                         onPress={goToPreviousTab}
                         disabled={isFirstTab || isSaving}
-                        style={{ flex: 1, borderRadius: 6 }}
-                        contentStyle={{ minHeight: 46 }}
+                        style={{ flex: 1, borderRadius: 10 }}
+                        contentStyle={{ minHeight: 58 }}
+                        labelStyle={{ fontSize: 17, fontWeight: '700' }}
                     >
                         Précédent
                     </Button>
@@ -806,8 +817,9 @@ const VolontaireForm: React.FC<VolontaireFormProps> = ({
                         onPress={goToNextTab}
                         loading={isLastTab && isSaving}
                         disabled={isSaving}
-                        style={{ flex: 1, borderRadius: 6, backgroundColor: '#2563EB' }}
-                        contentStyle={{ minHeight: 46, flexDirection: isLastTab ? 'row' : 'row-reverse' }}
+                        style={{ flex: 1, borderRadius: 10, backgroundColor: '#2563EB' }}
+                        contentStyle={{ minHeight: 58, flexDirection: isLastTab ? 'row' : 'row-reverse' }}
+                        labelStyle={{ fontSize: 17, fontWeight: '700' }}
                     >
                         {isLastTab ? 'Enregistrer' : 'Suivant'}
                     </Button>

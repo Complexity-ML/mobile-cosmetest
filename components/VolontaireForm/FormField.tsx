@@ -1,6 +1,6 @@
 // FormField.tsx
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, TouchableOpacity, Alert, ScrollView, StyleSheet } from 'react-native';
 import { TextInput as PaperTextInput, HelperText, Text, Button, Dialog, Portal, RadioButton } from 'react-native-paper';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Feather';
@@ -111,14 +111,19 @@ const FormField: React.FC<FormFieldProps> = ({
   };
 
   return (
-    <View style={{ marginBottom: 18 }}>
-      <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 6 }}>
+    <View style={styles.field}>
+      <Text style={styles.label}>
         {label}
         {required && ' *'}
       </Text>
       {infoTooltip && (
-        <TouchableOpacity onPress={() => Alert.alert('Info', infoTooltip)}>
-          <Icon name="info" size={16} />
+        <TouchableOpacity
+          onPress={() => Alert.alert('Information', infoTooltip)}
+          accessibilityRole="button"
+          accessibilityLabel={`Information sur ${label}`}
+          style={styles.infoButton}
+        >
+          <Icon name="info" size={22} color="#2563EB" />
         </TouchableOpacity>
       )}
 
@@ -133,7 +138,7 @@ const FormField: React.FC<FormFieldProps> = ({
               right={<PaperTextInput.Icon icon="chevron-down" />}
               editable={false}
               error={!!error}
-              style={{ backgroundColor: '#FFFFFF' }}
+              style={styles.input}
             />
           </TouchableOpacity>
 
@@ -158,8 +163,8 @@ const FormField: React.FC<FormFieldProps> = ({
                           <RadioButton.Item
                             label={labelOpt}
                             value={valueOpt}
-                            labelStyle={{ fontSize: 16 }}
-                            style={{ minHeight: 50, paddingVertical: 4 }}
+                            labelStyle={styles.optionLabel}
+                            style={styles.option}
                           />
                         </View>
                       );
@@ -168,7 +173,13 @@ const FormField: React.FC<FormFieldProps> = ({
                 </ScrollView>
               </Dialog.Content>
               <Dialog.Actions>
-                <Button onPress={() => setShowSelectDialog(false)}>Fermer</Button>
+                <Button
+                  onPress={() => setShowSelectDialog(false)}
+                  contentStyle={styles.dialogButton}
+                  labelStyle={styles.dialogButtonLabel}
+                >
+                  Fermer
+                </Button>
               </Dialog.Actions>
             </Dialog>
           </Portal>
@@ -190,7 +201,7 @@ const FormField: React.FC<FormFieldProps> = ({
               right={<PaperTextInput.Icon icon="calendar" />}
               editable={false}
               error={!!error}
-              style={{ backgroundColor: '#FFFFFF' }}
+              style={styles.input}
             />
           </TouchableOpacity>
           {showDatePicker && (
@@ -217,7 +228,7 @@ const FormField: React.FC<FormFieldProps> = ({
             placeholder={placeholder}
             multiline
             numberOfLines={numberOfLines}
-            style={{ backgroundColor: '#FFFFFF' }}
+            style={[styles.input, styles.textarea]}
           />
           {!!error && (
             <HelperText type="error" visible={true}>
@@ -236,7 +247,7 @@ const FormField: React.FC<FormFieldProps> = ({
             placeholder={placeholder}
             keyboardType={type === 'number' ? 'numeric' : 'default'}
             error={!!error}
-            style={{ backgroundColor: '#FFFFFF' }}
+            style={styles.input}
           />
           {!!error && (
             <HelperText type="error" visible={true}>
@@ -248,5 +259,48 @@ const FormField: React.FC<FormFieldProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  field: {
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  infoButton: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -8,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    fontSize: 18,
+    minHeight: 58,
+  },
+  textarea: {
+    minHeight: 120,
+  },
+  option: {
+    minHeight: 60,
+    paddingVertical: 6,
+  },
+  optionLabel: {
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  dialogButton: {
+    minHeight: 56,
+  },
+  dialogButtonLabel: {
+    fontSize: 17,
+    fontWeight: '700',
+  },
+});
 
 export default FormField;

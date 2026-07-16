@@ -1,137 +1,181 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Text, Divider } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Text, Divider, Button } from 'react-native-paper';
 import { SectionProps } from '../types';
 import { FORM_SECTIONS } from '../habitudesCosmetiquesConfig';
+import CheckboxField from '../CheckboxField';
 
-const isOuiValue = (value: unknown) => value === true || String(value).toLowerCase() === 'oui' || String(value).toLowerCase() === 'true';
-const isNonValue = (value: unknown) => value === false || String(value).toLowerCase() === 'non' || String(value).toLowerCase() === 'false';
+interface HabitudesCosmetiquesSectionProps extends SectionProps {
+  onPageChange?: () => void;
+}
 
-const BooleanField = ({ label, id, value, onChange }: {
-  label: string;
-  id: string;
-  value: string;
-  onChange: (name: string, value: string) => void;
+const HabitudesCosmetiquesSection: React.FC<HabitudesCosmetiquesSectionProps> = ({
+  formData,
+  handleChange,
+  onPageChange,
 }) => {
-  const isOui = isOuiValue(value);
-  const isNon = isNonValue(value);
+  const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const activeSection = FORM_SECTIONS[activeSectionIndex];
+  const progress = ((activeSectionIndex + 1) / FORM_SECTIONS.length) * 100;
+
+  const changeSection = (nextIndex: number) => {
+    if (nextIndex < 0 || nextIndex >= FORM_SECTIONS.length) return;
+    setActiveSectionIndex(nextIndex);
+    onPageChange?.();
+  };
 
   return (
-    <View style={styles.row}>
-      <Text style={styles.label} numberOfLines={1}>{label}</Text>
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          onPress={() => onChange(id, 'oui')}
-          style={[styles.button, isOui ? styles.ouiActive : styles.inactive]}
+    <View>
+      <Text variant="headlineMedium" style={styles.title}>Habitudes cosmétiques</Text>
+      <Text style={styles.instructions}>
+        Répondez simplement avec Oui ou Non. Les questions de cette rubrique sont facultatives.
+      </Text>
+
+      <View style={styles.progressCard}>
+        <View style={styles.progressHeader}>
+          <Text style={styles.progressLabel}>
+            Catégorie {activeSectionIndex + 1} sur {FORM_SECTIONS.length}
+          </Text>
+          <Text style={styles.progressTitle}>{activeSection.title}</Text>
+        </View>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        </View>
+      </View>
+
+      <Divider style={styles.divider} />
+
+      <View style={styles.sectionCard}>
+        <Text variant="titleLarge" style={styles.sectionTitle}>{activeSection.title}</Text>
+        {activeSection.groups.map((group, groupIndex) => (
+          <View key={`${activeSection.title}-${groupIndex}`} style={styles.group}>
+            {group.title && <Text style={styles.groupTitle}>{group.title}</Text>}
+            {group.items.map((item) => (
+              <CheckboxField
+                key={item.id}
+                label={item.label}
+                id={item.id}
+                value={formData[item.id] || ''}
+                allowUnknown={false}
+                onChange={(id, value) => handleChange(id, value.toLowerCase())}
+              />
+            ))}
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.navigation}>
+        <Button
+          mode="outlined"
+          disabled={activeSectionIndex === 0}
+          onPress={() => changeSection(activeSectionIndex - 1)}
+          style={styles.navigationButton}
+          contentStyle={styles.navigationButtonContent}
+          labelStyle={styles.navigationButtonLabel}
         >
-          <Text style={[styles.buttonText, isOui ? styles.ouiText : styles.inactiveText]}>Oui</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => onChange(id, 'non')}
-          style={[styles.button, isNon ? styles.nonActive : styles.inactive]}
-        >
-          <Text style={[styles.buttonText, isNon ? styles.nonText : styles.inactiveText]}>Non</Text>
-        </TouchableOpacity>
+          Catégorie précédente
+        </Button>
+        {activeSectionIndex < FORM_SECTIONS.length - 1 && (
+          <Button
+            mode="contained"
+            onPress={() => changeSection(activeSectionIndex + 1)}
+            style={styles.navigationButton}
+            contentStyle={[styles.navigationButtonContent, styles.nextButtonContent]}
+            labelStyle={styles.navigationButtonLabel}
+          >
+            Catégorie suivante
+          </Button>
+        )}
       </View>
     </View>
   );
 };
 
-const HabitudesCosmetiquesSection: React.FC<SectionProps> = ({
-  formData,
-  handleChange,
-}) => {
-  return (
-    <>
-      <Text variant="headlineMedium" style={{ marginBottom: 8 }}>Habitudes cosmétiques</Text>
-      <Divider style={{ marginBottom: 12 }} />
-
-      {FORM_SECTIONS.map((section) => (
-        <View key={section.title} style={{ marginBottom: 16 }}>
-          <Text variant="titleMedium" style={{ marginBottom: 8, marginTop: 4 }}>
-            {section.title}
-          </Text>
-          {section.groups.map((group, gi) => (
-            <View key={`${section.title}-${gi}`}>
-              {group.title && (
-                <Text style={styles.groupTitle}>{group.title}</Text>
-              )}
-              {group.items.map((item) => (
-                <BooleanField
-                  key={item.id}
-                  label={item.label}
-                  id={item.id}
-                  value={formData[item.id] || ''}
-                  onChange={handleChange}
-                />
-              ))}
-            </View>
-          ))}
-          <Divider style={{ marginTop: 8 }} />
-        </View>
-      ))}
-    </>
-  );
-};
-
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 5,
-    paddingHorizontal: 4,
+  title: {
+    marginBottom: 8,
+    color: '#111827',
   },
-  label: {
-    flex: 1,
-    fontSize: 14,
-    color: '#374151',
-    marginRight: 12,
+  instructions: {
+    fontSize: 17,
+    lineHeight: 24,
+    color: '#4B5563',
+    marginBottom: 16,
   },
-  buttons: {
-    flexDirection: 'row',
+  progressCard: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+  },
+  progressHeader: {
     gap: 4,
   },
-  button: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 6,
-    borderWidth: 1,
-    minWidth: 44,
-    alignItems: 'center',
-  },
-  ouiActive: {
-    backgroundColor: '#F0FDF4',
-    borderColor: '#4ADE80',
-  },
-  nonActive: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#F87171',
-  },
-  inactive: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D1D5DB',
-  },
-  buttonText: {
-    fontSize: 12,
+  progressLabel: {
+    fontSize: 16,
+    color: '#1D4ED8',
     fontWeight: '600',
   },
-  ouiText: {
-    color: '#15803D',
+  progressTitle: {
+    fontSize: 20,
+    color: '#111827',
+    fontWeight: '700',
   },
-  nonText: {
-    color: '#DC2626',
+  progressTrack: {
+    height: 10,
+    backgroundColor: '#DBEAFE',
+    borderRadius: 999,
+    marginTop: 12,
+    overflow: 'hidden',
   },
-  inactiveText: {
-    color: '#9CA3AF',
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#2563EB',
+    borderRadius: 999,
+  },
+  divider: {
+    marginVertical: 18,
+  },
+  sectionCard: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+  },
+  sectionTitle: {
+    color: '#111827',
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  group: {
+    marginBottom: 12,
   },
   groupTitle: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#6B7280',
-    marginTop: 6,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#374151',
+    marginTop: 8,
     marginBottom: 4,
-    marginLeft: 4,
+  },
+  navigation: {
+    gap: 12,
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  navigationButton: {
+    borderRadius: 10,
+  },
+  navigationButtonContent: {
+    minHeight: 58,
+  },
+  nextButtonContent: {
+    flexDirection: 'row-reverse',
+  },
+  navigationButtonLabel: {
+    fontSize: 17,
+    fontWeight: '700',
   },
 });
 
